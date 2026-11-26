@@ -92,7 +92,7 @@ npm run dev                                            # http://localhost:5173
 ## Deploy: Render + Neon (free tiers)
 
 1. **Neon:** create a project in the Singapore region. Open *Connect*, turn **Connection pooling off**, show the password and copy the connection string: `postgresql://USER:PASS@ep-xxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require…`
-2. **Render:** go to *New, then Blueprint*, and pick this repo. `render.yaml` creates `handover-agent`, `handover-backend` and `handover-ai`. Paste that one connection string into `DATABASE_URL` for both the agent and the backend; the backend converts it to JDBC itself. Also set:
+2. **Render:** go to *New, then Blueprint*, and pick this repo. `render.yaml` creates `handover-agent`, `handover-backend` and `handoverai` (the site, at handoverai.onrender.com). Paste that one connection string into `DATABASE_URL` for both the agent and the backend; the backend converts it to JDBC itself. Also set:
    - `AGENT_URL`: the agent's `https://….onrender.com`
    - `CORS_ORIGINS`: the UI's URL
    - `ANTHROPIC_API_KEY`, plus `LLM_PROVIDER=anthropic`, if you want a real model

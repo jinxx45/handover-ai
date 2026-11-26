@@ -38,7 +38,7 @@ services:
         sync: false
       - key: AGENT_TIMEOUT_SECONDS
         value: "120"
-      - key: CORS_ORIGINS # https://handover-ai.onrender.com
+      - key: CORS_ORIGINS # https://handoverai.onrender.com
         sync: false
       - key: MEDIA_DIR # free instances have no persistent disk; recordings vanish on restart
         value: /tmp/media
@@ -47,7 +47,7 @@ services:
 
   # React app as a static site. /v1 is proxied to the backend, so the browser sees one origin.
   - type: web
-    name: handover-ai
+    name: handoverai
     runtime: static
     rootDir: ui
     buildCommand: npm ci && npm run build
