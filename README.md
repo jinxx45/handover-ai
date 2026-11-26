@@ -96,7 +96,7 @@ npm run dev                                            # http://localhost:5173
    - `AGENT_URL`: the agent's `https://….onrender.com`
    - `CORS_ORIGINS`: the UI's URL
    - `ANTHROPIC_API_KEY`, plus `LLM_PROVIDER=anthropic`, if you want a real model
-3. If Render gives the backend a URL other than `handover-backend.onrender.com`, change the `/v1/*` rewrite at the bottom of `render.yaml`.
+3. If Render gives the backend a URL other than `handover-backend.onrender.com` (ours is `handover-backend-nvfj`), change the `/v1/*` rewrite at the bottom of `render.yaml`.
 4. Tables are created on first start: Hibernate creates the app tables, and the agent creates its checkpoint tables.
 
 Free-tier caveats:

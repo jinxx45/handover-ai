@@ -60,7 +60,7 @@ services:
       # If Render gave the backend a different URL, change it here.
       - type: rewrite
         source: /v1/*
-        destination: https://handover-backend.onrender.com/v1/*
+        destination: https://handover-backend-nvfj.onrender.com/v1/*
       - type: rewrite
         source: /*
         destination: /index.html
