@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 680" width="1200" height="680" font-family="Inter, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#6b7280"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="680" fill="#ffffff"/>
+  <text x="40" y="44" font-size="22" font-weight="700" fill="#1b1d1f">handover.ai · system architecture</text>
+  <text x="40" y="68" font-size="13" fill="#6b7280">One departure event in; a cited handover pack, reassigned duties and a Q&amp;A assistant out.</text>
+
+  <!-- sources -->
+  <rect x="40" y="110" width="230" height="200" rx="12" fill="#f6f5f1" stroke="#d8d4cb"/>
+  <text x="56" y="136" font-size="13" font-weight="700" fill="#4b5157">1 · DEPARTURE SIGNAL</text>
+  <rect x="58" y="152" width="194" height="62" rx="8" fill="#fff" stroke="#b9b4a8"/>
+  <text x="155" y="179" font-size="14" font-weight="600" text-anchor="middle" fill="#1b1d1f">Workday</text>
+  <text x="155" y="198" font-size="12" text-anchor="middle" fill="#6b7280">business process event</text>
+  <rect x="58" y="228" width="194" height="62" rx="8" fill="#fff" stroke="#b9b4a8"/>
+  <text x="155" y="255" font-size="14" font-weight="600" text-anchor="middle" fill="#1b1d1f">Any HRIS / form</text>
+  <text x="155" y="274" font-size="12" text-anchor="middle" fill="#6b7280">same CloudEvents shape</text>
+
+  <!-- product container -->
+  <rect x="320" y="90" width="580" height="410" rx="14" fill="#f3faf8" stroke="#0f766e" stroke-dasharray="6 4"/>
+  <text x="338" y="116" font-size="13" font-weight="700" fill="#0b5953">2 · HANDOVER.AI</text>
+
+  <rect x="350" y="134" width="220" height="64" rx="10" fill="#e3f2ef" stroke="#0f766e"/>
+  <text x="460" y="162" font-size="15" font-weight="700" text-anchor="middle" fill="#0b3b37">Web app</text>
+  <text x="460" y="182" font-size="12" text-anchor="middle" fill="#2f5f59">React · Vite · TypeScript</text>
+
+  <rect x="350" y="252" width="220" height="80" rx="10" fill="#0f766e" stroke="#0b5953"/>
+  <text x="460" y="282" font-size="15" font-weight="700" text-anchor="middle" fill="#ffffff">Case service</text>
+  <text x="460" y="302" font-size="12" text-anchor="middle" fill="#d7efea">Java 21 · Spring Boot</text>
+  <text x="460" y="319" font-size="11" text-anchor="middle" fill="#d7efea">events · cases · connectors · approvals</text>
+
+  <rect x="650" y="252" width="220" height="80" rx="10" fill="#efe8fc" stroke="#6d28d9"/>
+  <text x="760" y="282" font-size="15" font-weight="700" text-anchor="middle" fill="#3b1580">Interview agent</text>
+  <text x="760" y="302" font-size="12" text-anchor="middle" fill="#5b3a99">Python · FastAPI · LangGraph</text>
+  <text x="760" y="319" font-size="11" text-anchor="middle" fill="#5b3a99">risk · interview · pack · cited Q&amp;A</text>
+
+  <rect x="350" y="400" width="220" height="74" rx="10" fill="#fff" stroke="#0f766e"/>
+  <ellipse cx="460" cy="400" rx="110" ry="10" fill="#e3f2ef" stroke="#0f766e"/>
+  <text x="460" y="433" font-size="14" font-weight="700" text-anchor="middle" fill="#0b3b37">Postgres</text>
+  <text x="460" y="452" font-size="11" text-anchor="middle" fill="#2f5f59">cases · items · evidence · packs</text>
+
+  <rect x="650" y="400" width="220" height="74" rx="10" fill="#fff" stroke="#6d28d9"/>
+  <ellipse cx="760" cy="400" rx="110" ry="10" fill="#efe8fc" stroke="#6d28d9"/>
+  <text x="760" y="433" font-size="14" font-weight="700" text-anchor="middle" fill="#3b1580">Checkpoints</text>
+  <text x="760" y="452" font-size="11" text-anchor="middle" fill="#5b3a99">paused interviews (SQLite)</text>
+
+  <!-- llm -->
+  <rect x="950" y="252" width="210" height="80" rx="10" fill="#fff" stroke="#b9b4a8"/>
+  <text x="1055" y="282" font-size="15" font-weight="700" text-anchor="middle" fill="#1b1d1f">LLM</text>
+  <text x="1055" y="302" font-size="12" text-anchor="middle" fill="#6b7280">Claude · OpenAI · gateway</text>
+  <text x="1055" y="319" font-size="11" text-anchor="middle" fill="#6b7280">offline mock as fallback</text>
+
+  <!-- connectors -->
+  <rect x="40" y="540" width="1120" height="110" rx="14" fill="#fdf8ef" stroke="#e9c58f"/>
+  <text x="58" y="566" font-size="13" font-weight="700" fill="#8a4b07">3 · CONNECTORS · discover(person)</text>
+  <g font-size="13" font-weight="600" fill="#1b1d1f" text-anchor="middle">
+    <rect x="58" y="580" width="166" height="52" rx="8" fill="#fff" stroke="#e0b36d"/><text x="141" y="602">GitHub / GHE</text>
+    <rect x="240" y="580" width="166" height="52" rx="8" fill="#fff" stroke="#e0b36d"/><text x="323" y="602">Jira / JSM</text>
+    <rect x="422" y="580" width="166" height="52" rx="8" fill="#fff" stroke="#e0b36d"/><text x="505" y="602">Confluence</text>
+    <rect x="604" y="580" width="166" height="52" rx="8" fill="#fff" stroke="#e0b36d"/><text x="687" y="602">Google Drive</text>
+    <rect x="786" y="580" width="166" height="52" rx="8" fill="#fff" stroke="#e0b36d"/><text x="869" y="602">Google Calendar</text>
+    <rect x="968" y="580" width="174" height="52" rx="8" fill="#fff" stroke="#e0b36d"/><text x="1055" y="602">PagerDuty</text>
+  </g>
+  <g font-size="11" fill="#8a6a3a" text-anchor="middle">
+    <text x="141" y="620">ownership · CODEOWNERS</text>
+    <text x="323" y="620">open work · approvals</text>
+    <text x="505" y="620">pages written</text>
+    <text x="687" y="620">files to transfer</text>
+    <text x="869" y="620">recurring duties</text>
+    <text x="1055" y="620">on-call</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#6b7280" stroke-width="1.6" fill="none" marker-end="url(#ar)">
+    <path d="M270 292 H348"/>
+    <path d="M460 198 V250"/>
+    <path d="M570 292 H648"/>
+    <path d="M460 332 V388"/>
+    <path d="M760 332 V388"/>
+    <path d="M870 292 H948"/>
+    <path d="M350 318 H330 V520 H600 V538"/>
+  </g>
+  <g font-size="11" fill="#4b5157">
+    <text x="278" y="284">event</text>
+    <text x="470" y="230">REST /v1</text>
+    <text x="580" y="282">/runs · /ask</text>
+    <text x="880" y="282">prompts</text>
+    <text x="340" y="514">pull owned items + evidence</text>
+  </g>
+</svg>

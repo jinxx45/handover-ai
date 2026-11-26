@@ -1,0 +1,23 @@
+flowchart LR
+  P(("Departing<br/>person"))
+  P --> GH["GitHub / GHE"]
+  P --> JI["Jira / JSM"]
+  P --> CF["Confluence"]
+  P --> GD["Google Drive"]
+  P --> GC["Google Calendar"]
+  P --> PD["PagerDuty"]
+
+  GH --> G1["Repos by ownership share<br/>(their commits ÷ all commits, 180 days)"]
+  GH --> G2["Sole-owner files<br/>(≥ 80% of a file's commits)"]
+  GH --> G3["CODEOWNERS paths<br/>→ approval, must reassign"]
+  JI --> J1["Open work per project"]
+  JI --> J2["Approvals: pendingBy / approvedBy<br/>→ approval, must reassign"]
+  CF --> C1["Pages they wrote or edited<br/>→ existing docs, agent context"]
+  GD --> D1["Shared files they own<br/>→ transfer ownership"]
+  GC --> K1["Recurring meetings they run<br/>→ recurring duty, must reassign"]
+  PD --> O1["Escalation policies + incidents<br/>→ on-call, must reassign"]
+
+  classDef must fill:#fdf0dc,stroke:#b45309,color:#5c2c04
+  classDef know fill:#e3f2ef,stroke:#0f766e,color:#0b3b37
+  class G3,J2,D1,K1,O1 must
+  class G1,G2,J1,C1 know

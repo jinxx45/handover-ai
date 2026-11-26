@@ -1,0 +1,29 @@
+[
+  {
+    "personId": "priya",
+    "name": "Priya Raman",
+    "email": "priya.raman@acme.example",
+    "role": "Senior Software Engineer, Billing Platform",
+    "managerName": "Suresh Iyer",
+    "noticeDays": 14,
+    "exitType": "voluntary"
+  },
+  {
+    "personId": "meera",
+    "name": "Meera Krishnan",
+    "email": "meera.k@acme.example",
+    "role": "Engineering Manager, Payments",
+    "managerName": "Anand Rao",
+    "noticeDays": 30,
+    "exitType": "voluntary"
+  },
+  {
+    "personId": "karthik",
+    "name": "Karthik Subramanian",
+    "email": "karthik.s@acme.example",
+    "role": "Customer Success Manager, Enterprise",
+    "managerName": "Divya Menon",
+    "noticeDays": 21,
+    "exitType": "voluntary"
+  }
+]

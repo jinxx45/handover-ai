@@ -1,0 +1,48 @@
+erDiagram
+  HANDOVER_CASE ||--o{ OWNED_ITEM : owns
+  HANDOVER_CASE ||--o{ EVIDENCE_CHUNK : "has evidence"
+  HANDOVER_CASE ||--o{ INTERVIEW_TURN : "has answers"
+  HANDOVER_CASE ||--o{ PACK_QUESTION : "gets questions"
+  OWNED_ITEM ||--o{ EVIDENCE_CHUNK : "backed by"
+  OWNED_ITEM ||--o{ INTERVIEW_TURN : "explained by"
+
+  HANDOVER_CASE {
+    string id PK
+    string eventId UK
+    string personName
+    date lastDay
+    string status
+    string agentRunId
+    text packJson
+    string approvedBy
+  }
+  OWNED_ITEM {
+    string id PK
+    string kind
+    string title
+    string source
+    float ownershipShare
+    bool needsReassignment
+    float riskScore
+    string coverage
+    string successor
+  }
+  EVIDENCE_CHUNK {
+    long id PK
+    string label "E1, E2..."
+    string source
+    text text
+  }
+  INTERVIEW_TURN {
+    long id PK
+    string label "I1, I2..."
+    text question
+    text answer
+  }
+  PACK_QUESTION {
+    long id PK
+    text question
+    text answer
+    string citations
+    bool covered
+  }

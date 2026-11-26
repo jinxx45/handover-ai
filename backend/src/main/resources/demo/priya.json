@@ -1,0 +1,124 @@
+{
+  "items": [
+    {
+      "kind": "recurring_task",
+      "title": "Quarter-end revenue reconciliation (reconcile_q.py)",
+      "source": "github",
+      "url": "https://github.example/acme/billing-tools/blob/main/scripts/reconcile_q.py",
+      "activity": 9,
+      "hasDocs": false,
+      "lastActivityDays": 6,
+      "evidence": [
+        "reconcile_q.py: pulls ledger exports from s3://acme-finance/ledger/{quarter}/, compares totals with billing DB invoices, writes mismatches to recon_report.csv. Last 4 runs were all triggered manually by priya.raman in the last 3 days of the quarter.",
+        "Slack #billing-oncall (Oct 1): 'recon is red again, Priya can you rerun with --skip-fx?' \u2014 Priya: 'done, FX table was stale, will fix properly next quarter'.",
+        "acme/billing-tools is written in Python 88%, SQL 12%."
+      ],
+      "ownershipShare": 0.92
+    },
+    {
+      "kind": "service",
+      "title": "billing-sync service",
+      "source": "github",
+      "url": "https://github.example/acme/billing-sync",
+      "activity": 27,
+      "hasDocs": false,
+      "lastActivityDays": 2,
+      "evidence": [
+        "billing-sync consumes invoice events from Kafka topic invoices.v2 and writes to the payments gateway. Priya made 61% of the 212 commits in the last 180 days; 4 other contributors.",
+        "BILL-142: billing-sync retries exhausted 3 times last quarter; messages ended in the dead-letter topic invoices.v2.dlq. Resolved by Priya with a manual replay.",
+        "Files where nobody else has made meaningful changes: src/retry/BackoffPolicy.kt (14/15 commits), src/gateway/IdempotencyKeys.kt (9/9 commits)",
+        "acme/billing-sync is written in Kotlin 74%, SQL 16%, Shell 10%."
+      ],
+      "ownershipShare": 0.61
+    },
+    {
+      "kind": "approval",
+      "title": "Required code reviewer in acme/billing-sync",
+      "source": "github",
+      "url": "https://github.example/acme/billing-sync/blob/HEAD/.github/CODEOWNERS",
+      "activity": 3,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "evidence": [
+        "CODEOWNERS in acme/billing-sync lists Priya as required reviewer for: /src/gateway/, /deploy/prod/, /migrations/",
+        "She is the ONLY owner for: /deploy/prod/. Pull requests touching production deploy config cannot be approved once her account is closed."
+      ]
+    },
+    {
+      "kind": "oncall",
+      "title": "On-call: Billing Platform (level 1)",
+      "source": "pagerduty",
+      "url": null,
+      "activity": 9,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "evidence": [
+        "On escalation policy 'Billing Platform' via schedule 'Billing primary'. Handled 9 incidents in the last 90 days, 6 of them billing-sync retries."
+      ]
+    },
+    {
+      "kind": "service",
+      "title": "invoice-pdf renderer",
+      "source": "github",
+      "url": "https://github.example/acme/invoice-pdf",
+      "activity": 4,
+      "hasDocs": true,
+      "lastActivityDays": 40,
+      "evidence": [
+        "invoice-pdf has a README with build, deploy and template update steps. Owned jointly with the billing team.",
+        "acme/invoice-pdf is written in TypeScript 81%, HTML 19%."
+      ],
+      "ownershipShare": 0.18
+    },
+    {
+      "kind": "customer",
+      "title": "Northwind Retail (custom invoicing contract)",
+      "source": "jira",
+      "url": "https://jira.example/browse/BILL-160",
+      "activity": 11,
+      "hasDocs": false,
+      "lastActivityDays": 9,
+      "evidence": [
+        "BILL-160: Northwind needs consolidated invoices across 14 store entities; custom flag NW_CONSOLIDATE in billing-sync config. Priya is the only engineer on the account thread.",
+        "Email thread summary: Northwind finance lead asks for 48h notice before any invoice format change."
+      ]
+    },
+    {
+      "kind": "ticket_queue",
+      "title": "Open BILL tickets assigned to Priya",
+      "source": "jira",
+      "url": "https://jira.example/issues/?jql=assignee%3Dpriya.raman",
+      "activity": 14,
+      "hasDocs": false,
+      "lastActivityDays": 1,
+      "evidence": [
+        "BILL-171 (In progress): Move FX rates table refresh from manual CSV upload to the treasury API. Blocks the quarter-end recon fix.",
+        "BILL-175 (To do): Upgrade Kafka client in billing-sync before platform deprecates v2 brokers in January."
+      ]
+    },
+    {
+      "kind": "doc",
+      "title": "Billing platform architecture overview",
+      "source": "drive",
+      "url": "https://docs.example/billing-architecture",
+      "activity": 2,
+      "hasDocs": true,
+      "lastActivityDays": 120,
+      "evidence": [
+        "Architecture overview: invoices flow from order service \u2192 Kafka invoices.v2 \u2192 billing-sync \u2192 payments gateway; PDFs rendered by invoice-pdf. Written 2025, partly outdated."
+      ]
+    },
+    {
+      "kind": "contact",
+      "title": "Ravi Kumar (Finance controller)",
+      "source": "calendar",
+      "url": null,
+      "activity": 6,
+      "hasDocs": false,
+      "lastActivityDays": 12,
+      "evidence": [
+        "Recurring meeting 'Recon sync' with Ravi Kumar on the last Thursday of each quarter month, owned by Priya."
+      ]
+    }
+  ]
+}

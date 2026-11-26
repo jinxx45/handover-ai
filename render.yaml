@@ -1,0 +1,69 @@
+# Render Blueprint: Dashboard → New → Blueprint → pick this repo.
+# Three services on the free plan; the database is Neon (set DB_URL / DATABASE_URL by hand).
+# Values marked sync: false are asked for once, when the Blueprint is first applied.
+services:
+  # LangGraph interviewer. Keeps interviews in Neon so a restart doesn't lose them.
+  - type: web
+    name: handover-agent
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./agent
+    dockerfilePath: ./agent/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL # Neon connection string: postgresql://user:pass@ep-....neon.tech/neondb?sslmode=require
+        sync: false
+      - key: LLM_PROVIDER # anthropic, openai or mock
+        value: mock
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  # Spring Boot API: cases, connectors, uploads.
+  - type: web
+    name: handover-backend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: DB_URL # jdbc:postgresql://ep-....neon.tech/neondb?sslmode=require
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: AGENT_URL # https://handover-agent.onrender.com (the agent's URL from the dashboard)
+        sync: false
+      - key: AGENT_TIMEOUT_SECONDS
+        value: "120"
+      - key: CORS_ORIGINS # https://handover-ui.onrender.com
+        sync: false
+      - key: MEDIA_DIR # free instances have no persistent disk; recordings vanish on restart
+        value: /tmp/media
+      - key: MAX_UPLOAD
+        value: 50MB
+
+  # React app as a static site. /v1 is proxied to the backend, so the browser sees one origin.
+  - type: web
+    name: handover-ui
+    runtime: static
+    rootDir: ui
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    headers:
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
+    routes:
+      # If Render gave the backend a different URL, change it here.
+      - type: rewrite
+        source: /v1/*
+        destination: https://handover-backend.onrender.com/v1/*
+      - type: rewrite
+        source: /*
+        destination: /index.html

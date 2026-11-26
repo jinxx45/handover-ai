@@ -1,0 +1,41 @@
+{
+  "items": [
+    {
+      "kind": "customer",
+      "title": "Contoso Health (renewal due in February)",
+      "source": "crm",
+      "url": "https://crm.example/accounts/contoso-health",
+      "activity": 18,
+      "hasDocs": false,
+      "lastActivityDays": 3,
+      "evidence": [
+        "Contoso Health renewal is due in February; health score dropped from 82 to 64 after the September outage.",
+        "Karthik promised the Contoso CIO a quarterly roadmap review; the next one is not scheduled yet."
+      ]
+    },
+    {
+      "kind": "customer",
+      "title": "Fabrikam Logistics",
+      "source": "crm",
+      "url": "https://crm.example/accounts/fabrikam",
+      "activity": 7,
+      "hasDocs": true,
+      "lastActivityDays": 15,
+      "evidence": [
+        "Fabrikam account plan is up to date in the CRM with contacts, goals and the expansion opportunity."
+      ]
+    },
+    {
+      "kind": "recurring_task",
+      "title": "Monthly executive business review deck",
+      "source": "drive",
+      "url": "https://docs.example/ebr-template",
+      "activity": 10,
+      "hasDocs": false,
+      "lastActivityDays": 8,
+      "evidence": [
+        "EBR deck is rebuilt every month from three dashboards; Karthik edits the template himself and sends it to five accounts."
+      ]
+    }
+  ]
+}

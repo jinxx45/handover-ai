@@ -1,0 +1,29 @@
+sequenceDiagram
+  autonumber
+  participant WD as Workday / HRIS
+  participant BE as Case service (Spring Boot)
+  participant CN as Connectors
+  participant AG as Interview agent (LangGraph)
+  actor L as Leaver
+  actor M as Manager
+  actor S as Successor
+
+  WD->>BE: POST /v1/events person.departed
+  BE->>BE: Create case (idempotent on event id)
+  BE->>CN: discover(person) on every enabled connector
+  CN-->>BE: Owned items + evidence (E1, E2, ...)
+  BE->>AG: POST /runs {items, evidence}
+  AG->>AG: Score risk, plan interview (riskiest first)
+  AG-->>BE: First question (graph paused)
+  loop Until risky items are covered
+    L->>BE: Answer in the web app
+    BE->>AG: POST /runs/{id}/answer
+    AG-->>BE: Follow-up or next question
+  end
+  AG-->>BE: Drafted pack: every fact cites evidence or an answer
+  M->>BE: Assign new owners for approvals and duties
+  M->>BE: Approve and publish
+  S->>BE: Ask a question
+  BE->>AG: POST /ask {pack, evidence, answers}
+  AG-->>BE: Cited answer, or "not covered"
+  BE-->>S: Answer with sources

@@ -1,0 +1,72 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: handover-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/handover}
+    username: ${DB_USER:handover}
+    password: ${DB_PASSWORD:handover}
+  servlet:
+    multipart:
+      max-file-size: ${MAX_UPLOAD:200MB}
+      max-request-size: ${MAX_UPLOAD:200MB}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate.jdbc.time_zone: UTC
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+handover:
+  agent-url: ${AGENT_URL:http://localhost:8000}
+  agent-timeout-seconds: ${AGENT_TIMEOUT_SECONDS:120}
+  cors-origins: ${CORS_ORIGINS:http://localhost:5173}
+  media-dir: ${MEDIA_DIR:./data/media}
+  connectors:
+    fixture:
+      enabled: ${FIXTURE_ENABLED:true}
+    github:
+      # For GitHub Enterprise use https://<your-ghe-host>/api/v3
+      api-url: ${GITHUB_API_URL:https://api.github.com}
+      token: ${GITHUB_TOKEN:}
+      org: ${GITHUB_ORG:}
+    jira:
+      base-url: ${JIRA_BASE_URL:}
+      email: ${JIRA_EMAIL:}
+      token: ${JIRA_TOKEN:}
+      # Jira Service Management approvals; {user} is replaced with the person's email.
+      approval-jql-pending: ${JIRA_APPROVAL_JQL_PENDING:}
+      approval-jql-history: ${JIRA_APPROVAL_JQL_HISTORY:}
+    confluence:
+      base-url: ${CONFLUENCE_BASE_URL:}
+      email: ${CONFLUENCE_EMAIL:}
+      token: ${CONFLUENCE_TOKEN:}
+    google:
+      access-token: ${GOOGLE_ACCESS_TOKEN:}
+      drive-enabled: ${GOOGLE_DRIVE_ENABLED:true}
+      calendar-enabled: ${GOOGLE_CALENDAR_ENABLED:true}
+    pagerduty:
+      api-url: ${PAGERDUTY_API_URL:https://api.pagerduty.com}
+      token: ${PAGERDUTY_TOKEN:}
+
+---
+# Run without Postgres: SPRING_PROFILES_ACTIVE=local
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:h2:file:./data/handover;MODE=PostgreSQL;AUTO_SERVER=TRUE
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true

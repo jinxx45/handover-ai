@@ -1,0 +1,11 @@
+stateDiagram-v2
+  [*] --> MAPPING: person.departed event
+  MAPPING --> INTERVIEWING: agent has questions
+  MAPPING --> REVIEW: nothing risky to ask
+  MAPPING --> FAILED: agent unreachable
+  FAILED --> INTERVIEWING: Retry
+  INTERVIEWING --> INTERVIEWING: answer
+  INTERVIEWING --> REVIEW: all covered or Finish
+  REVIEW --> PUBLISHED: manager approves
+  PUBLISHED --> PUBLISHED: successor asks
+  PUBLISHED --> [*]

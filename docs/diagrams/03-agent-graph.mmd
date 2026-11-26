@@ -1,0 +1,17 @@
+flowchart TD
+  START(["START: items + evidence"]) --> A["analyze<br/>rule-based risk score per item"]
+  A --> P["plan<br/>queue items with risk ≥ 0.5, riskiest first, max 6"]
+  P --> R1{"Anything<br/>to ask?"}
+  R1 -- yes --> Q["prepare_question<br/>LLM writes one question from the evidence"]
+  R1 -- no --> D
+  Q --> W[["wait_for_answer<br/>interrupt(): checkpoint and pause<br/>(hours or days)"]]
+  W --> REC["record_answer<br/>save I#, maybe one follow-up if vague"]
+  REC --> R2{"Follow-up,<br/>more items,<br/>or finished?"}
+  R2 -- "follow-up / next item" --> Q
+  R2 -- "queue empty or Finish pressed" --> D["draft_pack<br/>LLM writes 8 sections, citations checked against real ids"]
+  D --> END(["END: pack"])
+
+  classDef pause fill:#e5ecfd,stroke:#1d4ed8,color:#0c2a6b
+  classDef llm fill:#efe8fc,stroke:#6d28d9,color:#3b1580
+  class W pause
+  class Q,D,REC llm
