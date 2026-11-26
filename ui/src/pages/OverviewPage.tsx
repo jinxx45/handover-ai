@@ -95,7 +95,7 @@ export default function OverviewPage() {
           <Words text="Nothing walks out the door." delay={0.1} />
         </h1>
         <p className="lede rv" style={{ ['--d' as string]: '.7s' }}>
-          When someone resigns, handover.ai finds the work only they know, asks them about it, and gets the next person ready.
+          When someone resigns, handover.ai finds the work only they know, interviews them about it, and equips their backfill with the knowledge they need.
         </p>
         <div className="ctas rv" style={{ ['--d' as string]: '.9s' }}>
           <button className="btn lg" disabled={starting !== null} onClick={() => resign('elena')}>
