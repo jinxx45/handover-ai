@@ -1,5 +1,6 @@
 # Render Blueprint: Dashboard → New → Blueprint → pick this repo.
-# Three services on the free plan; the database is Neon (set DB_URL / DATABASE_URL by hand).
+# Three services on the free plan; the database is Neon. Paste the same Neon connection string
+# into DATABASE_URL for both the agent and the backend.
 # Values marked sync: false are asked for once, when the Blueprint is first applied.
 services:
   # LangGraph interviewer. Keeps interviews in Neon so a restart doesn't lose them.
@@ -31,11 +32,7 @@ services:
     dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /actuator/health
     envVars:
-      - key: DB_URL # jdbc:postgresql://ep-....neon.tech/neondb?sslmode=require
-        sync: false
-      - key: DB_USER
-        sync: false
-      - key: DB_PASSWORD
+      - key: DATABASE_URL # the same Neon connection string as the agent; split into JDBC settings at startup
         sync: false
       - key: AGENT_URL # https://handover-agent.onrender.com (the agent's URL from the dashboard)
         sync: false

@@ -91,12 +91,11 @@ npm run dev                                            # http://localhost:5173
 
 ## Deploy: Render + Neon (free tiers)
 
-1. **Neon:** create a project (region: Singapore) and copy two connection strings from *Connect*, using the direct connection rather than the pooled one:
-   - for the agent: `postgresql://USER:PASS@ep-xxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`
-   - for the backend, the same host in JDBC form: `jdbc:postgresql://ep-xxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require`, plus the user and password separately.
-2. **Render:** *New, then Blueprint*, then pick this repo. `render.yaml` creates `handover-agent`, `handover-backend` and `handover-ui`. Fill in the values it asks for:
-   - agent: `DATABASE_URL`, and `ANTHROPIC_API_KEY` if you use a real model (set `LLM_PROVIDER=anthropic`)
-   - backend: `DB_URL`, `DB_USER`, `DB_PASSWORD`, `AGENT_URL` (the agent's `https://….onrender.com`), `CORS_ORIGINS` (the UI's URL)
+1. **Neon:** create a project in the Singapore region. Open *Connect*, turn **Connection pooling off**, show the password and copy the connection string: `postgresql://USER:PASS@ep-xxx.ap-southeast-1.aws.neon.tech/neondb?sslmode=require…`
+2. **Render:** go to *New, then Blueprint*, and pick this repo. `render.yaml` creates `handover-agent`, `handover-backend` and `handover-ui`. Paste that one connection string into `DATABASE_URL` for both the agent and the backend; the backend converts it to JDBC itself. Also set:
+   - `AGENT_URL`: the agent's `https://….onrender.com`
+   - `CORS_ORIGINS`: the UI's URL
+   - `ANTHROPIC_API_KEY`, plus `LLM_PROVIDER=anthropic`, if you want a real model
 3. If Render gives the backend a URL other than `handover-backend.onrender.com`, change the `/v1/*` rewrite at the bottom of `render.yaml`.
 4. Tables are created on first start: Hibernate creates the app tables, and the agent creates its checkpoint tables.
 
