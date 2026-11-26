@@ -12,10 +12,10 @@ export function itemState(i: Item): ItemState {
 }
 
 export const STATE_LABEL: Record<ItemState, string> = {
-  risk: 'At risk',
+  risk: 'Only in their head',
   owner: 'Needs a new owner',
   captured: 'Captured',
-  documented: 'Documented',
+  documented: 'Written down',
   low: 'Low risk',
 };
 
@@ -24,6 +24,7 @@ const ORDER: ItemState[] = ['risk', 'owner', 'captured', 'documented', 'low'];
 /** Legend wording with a count: "1 needs a new owner", "3 need a new owner". */
 export function countLabel(state: ItemState, n: number): string {
   if (state === 'owner') return `${n} ${n === 1 ? 'needs' : 'need'} a new owner`;
+  if (state === 'risk') return `${n} only in their head`;
   return `${n} ${STATE_LABEL[state].toLowerCase()}`;
 }
 
