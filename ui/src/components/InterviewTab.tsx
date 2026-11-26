@@ -5,6 +5,7 @@ import type { CaseDetail } from '../types';
 import { AttachControl, AttachmentList } from './Attachments';
 import { Spinner, firstName } from './ui';
 import { useDictation } from './useDictation';
+import { forViewer } from './CoverageTab';
 
 export default function InterviewTab({
   c,
@@ -61,8 +62,8 @@ export default function InterviewTab({
           )}
           {c.turns.map((t) => (
             <div className="turn" key={t.label}>
-              <div className="topic">{titles[t.itemId] ?? 'General'}</div>
-              <p className="q">{t.question}</p>
+              <div className="topic">{forViewer(titles[t.itemId] ?? 'General', name, self)}</div>
+              <p className="q">{forViewer(t.question, name, self)}</p>
               <p className="a">
                 {t.answer}
                 <span className="label">{t.label}</span>
@@ -76,10 +77,10 @@ export default function InterviewTab({
           {interviewing && c.currentQuestion && !busy && (
             <div className="turn current">
               <div className="topic">
-                {c.currentQuestion.itemTitle}
+                {forViewer(c.currentQuestion.itemTitle, name, self)}
                 {c.currentQuestion.isFollowup && ', follow-up'}
               </div>
-              <p className="q">{c.currentQuestion.question}</p>
+              <p className="q">{forViewer(c.currentQuestion.question, name, self)}</p>
               <div className="turn-att">
                 <AttachmentList items={forQuestion(c.currentQuestion.itemId)} c={c} onChange={onChange} />
                 {self ? (
@@ -168,7 +169,7 @@ export default function InterviewTab({
           return (
             <li key={i.id} className={done ? 'done' : now ? 'now' : ''}>
               <i />
-              <span>{i.title}</span>
+              <span>{forViewer(i.title, name, self)}</span>
             </li>
           );
         })}

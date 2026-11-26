@@ -109,7 +109,7 @@ export default function OverviewPage() {
             <i />
             <i />
           </div>
-          <div className="t">Elena Marsh, Senior Software Engineer, OMS UI. 14 days left.</div>
+          <div className="t">Elena Marsh, Senior Software Engineer, OMS UI. 14 days of notice period left.</div>
           <div className="big">Elena owns 7 things. Most of them aren&rsquo;t written down.</div>
           <div className="strip">
             {HERO_BLOCKS.map((b, n) => (
@@ -131,7 +131,7 @@ export default function OverviewPage() {
       </section>
 
       <section className="sec white">
-        <h2 className="rv">It finds what they own.</h2>
+        <h2 className="rv">handover.ai finds what they own.</h2>
         <p className="lede rv" style={{ ['--d' as string]: '.1s' }}>
           When Workday records a resignation, handover.ai checks GitHub, Jira, Confluence, Drive, Calendar and PagerDuty for the person&rsquo;s work.
         </p>
@@ -154,9 +154,9 @@ export default function OverviewPage() {
       </section>
 
       <section className="sec fog">
-        <h2 className="rv">It asks only about what isn&rsquo;t written down.</h2>
+        <h2 className="rv">handover.ai asks only about what isn&rsquo;t written down.</h2>
         <p className="lede rv" style={{ ['--d' as string]: '.1s' }}>
-          Most important first. Type, speak, or record your screen. If an answer is vague, it asks again.
+          Most important first. Type, speak, or record your screen. If an answer is vague, handover.ai asks again.
         </p>
         <div className="mock">
           <div className="bub q rv">You run the weekly OMS UI release. What are the steps, and how do you know it worked?</div>
@@ -178,7 +178,7 @@ export default function OverviewPage() {
           <sup className="g">GitHub</sup>
         </p>
         <p className="lede rv" style={{ ['--d' as string]: '.3s' }}>
-          If the handover doesn&rsquo;t cover something, it says so instead of guessing.
+          If the handover doesn&rsquo;t cover something, handover.ai says so instead of guessing.
         </p>
       </section>
 

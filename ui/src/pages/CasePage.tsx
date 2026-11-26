@@ -38,8 +38,9 @@ function tabsFor(pov: Pov, c: CaseDetail): { key: Tab; label: string; disabled?:
   ];
 }
 
-function defaultTab(pov: Pov, status: CaseStatus): Tab {
-  if (pov === 'leaver') return status === 'INTERVIEWING' ? 'interview' : status === 'MAPPING' || status === 'FAILED' ? 'ledger' : 'pack';
+function defaultTab(pov: Pov, status: CaseStatus, answered = 0): Tab {
+  // The leaver checks their list first; the interview opens from the "Start the interview" button.
+  if (pov === 'leaver') return status === 'INTERVIEWING' ? (answered ? 'interview' : 'ledger') : status === 'MAPPING' || status === 'FAILED' ? 'ledger' : 'pack';
   if (pov === 'newhire') return 'onboarding';
   if (status === 'REVIEW') return 'pack';
   return 'ledger';
@@ -55,8 +56,8 @@ function DemoBar({ c, pov, setPov }: { c: CaseDetail; pov: Pov; setPov: (p: Pov)
       .join('');
   const options: { key: Pov; who: string; role: string; av: string }[] = [
     { key: 'leaver', who: firstName(c.person.name), role: 'Leaving', av: initials(c.person.name) },
-    { key: 'manager', who: firstName(c.person.managerName ?? 'Manager'), role: 'Manager', av: initials(c.person.managerName ?? 'M') },
-    { key: 'newhire', who: 'New hire', role: 'Taking over', av: '+' },
+    { key: 'manager', who: firstName(c.person.managerName ?? 'Manager'), role: `${firstName(c.person.name)}’s manager`, av: initials(c.person.managerName ?? 'M') },
+    { key: 'newhire', who: 'New hire', role: `${firstName(c.person.name)}’s replacement`, av: '+' },
   ];
   return (
     <div className="demobar" role="group" aria-label="Demo: view this handover as">
@@ -87,19 +88,19 @@ export default function CasePage() {
       .case(caseId)
       .then((d) => {
         setC(d);
-        setTab(defaultTab(pov, d.status));
+        setTab(defaultTab(pov, d.status, d.turns.length));
       })
       .catch((e: Error) => setError(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseId]);
 
   useEffect(() => {
-    if (c) setTab(defaultTab(pov, c.status));
+    if (c) setTab(defaultTab(pov, c.status, c.turns.length));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pov]);
 
   function update(next: CaseDetail) {
-    if (c && next.status !== c.status && next.status !== 'PUBLISHED') setTab(defaultTab(pov, next.status));
+    if (c && next.status !== c.status && next.status !== 'PUBLISHED') setTab(defaultTab(pov, next.status, next.turns.length));
     setC(next);
   }
 
@@ -142,10 +143,10 @@ export default function CasePage() {
           <p className="csub">{sub}</p>
         </div>
         {days !== null && (
-          <div className="clock" aria-label={`${days} days left, last day ${formatDate(c.person.lastDay)}`}>
+          <div className="clock" aria-label={`${days} days of notice period left, last day ${formatDate(c.person.lastDay)}`}>
             <b>{Math.max(days, 0)}</b>
             <span>
-              {days === 1 ? 'day left' : 'days left'}
+              {days === 1 ? 'day of notice period left' : 'days of notice period left'}
               <small>Last day {formatDate(c.person.lastDay)}</small>
             </span>
             <Runway start={c.createdAt} lastDay={c.person.lastDay} />

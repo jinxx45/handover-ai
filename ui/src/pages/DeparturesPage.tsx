@@ -47,7 +47,7 @@ function DepartureCard({ c }: { c: CaseDetail }) {
           <div className="dc-days">
             <b>{Math.max(days, 0)}</b>
             <span>
-              {days === 1 ? 'day left' : 'days left'}
+              {days === 1 ? 'day of notice period left' : 'days of notice period left'}
               <small>Last day {formatDate(c.person.lastDay)}</small>
             </span>
           </div>

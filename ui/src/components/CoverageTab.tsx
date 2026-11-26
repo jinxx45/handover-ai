@@ -3,7 +3,7 @@ import { api } from '../api';
 import type { CaseDetail, Item } from '../types';
 import type { Pov } from '../pov';
 import type { Tab } from '../pages/CasePage';
-import { Strip, firstName, formatDate, itemState, type ItemState } from './ui';
+import { State, Strip, firstName, formatDate, itemState, type ItemState } from './ui';
 
 const KIND: Record<string, string> = {
   recurring_task: 'Regular task',
@@ -119,9 +119,8 @@ function why(item: Item, self: boolean): string {
   if (item.needsReassignment) reasons.push(self ? 'Stops working when your account closes' : 'Stops working when their account closes');
   else if (item.kind === 'recurring_task') reasons.push('Regular task that nobody else does');
   if (!item.hasDocs && ['service', 'repo', 'recurring_task', 'oncall'].includes(item.kind)) reasons.push('No runbook');
-  else if (!item.hasDocs && item.kind !== 'doc' && !item.needsReassignment) reasons.push('Not written down');
   if (reasons.length < 2 && item.activity >= 10 && ['service', 'repo'].includes(item.kind)) reasons.push(`${item.activity} changes recently`);
-  if (reasons.length === 0) reasons.push(item.hasDocs ? 'Already written down' : 'Rarely touched');
+  if (reasons.length === 0) return '';
   return reasons.slice(0, 2).join('. ') + '.';
 }
 
@@ -151,28 +150,37 @@ function OwnerField({ caseId, item, onChange }: { caseId: string; item: Item; on
   );
 }
 
-/** Groups by what happens next, so the group headings replace a legend and per-row status tags. */
-function groupsFor(self: boolean, pov: Pov, name: string, manager: string, lastDay: string) {
-  const you = self ? 'you' : name;
-  return [
-    {
-      state: 'owner' as ItemState,
-      title: self ? 'Needs a new owner before you go' : 'Needs a new owner',
-      note: self
-        ? `These stop working when your account closes. ${manager} chooses who takes each one, and the interview asks how you run them.`
-        : pov === 'manager'
-          ? `These stop working on ${lastDay}. Name someone for each.`
-          : 'These have moved to new owners.',
-    },
-    {
-      state: 'risk' as ItemState,
-      title: self ? 'Only you know how these work' : `Only ${name} knows how these work`,
-      note: self ? 'The interview asks you about these, most important first.' : `The interview asks ${name} about these, most important first.`,
-    },
-    { state: 'captured' as ItemState, title: 'Handed over', note: self ? 'Explained in your interview, or given to a new owner.' : `Explained in the interview, or given to a new owner.` },
-    { state: 'documented' as ItemState, title: 'Already written down', note: 'Nothing to do.' },
-    { state: 'low' as ItemState, title: 'Low priority', note: `Rarely touched. Nothing ${you === 'you' ? 'you need' : 'anyone needs'} to do.` },
-  ];
+/** Groups items by where they came from, so people can check one tool at a time. */
+type Category = { key: string; title: string; note: string };
+function categoryOf(i: Item): Category {
+  if (i.origin === 'manual') return { key: 'manual', title: 'Added by hand', note: 'Things the tools could not see.' };
+  if (i.kind === 'oncall') return { key: 'oncall', title: 'On-call', note: 'Rotations in PagerDuty.' };
+  switch (i.source) {
+    case 'github':
+      return { key: 'code', title: 'Code', note: 'Repositories, releases and code reviews in GitHub.' };
+    case 'jira':
+      return i.kind === 'approval'
+        ? { key: 'jira-approvals', title: 'Jira approvals', note: 'Requests in Jira that wait for this person to approve.' }
+        : { key: 'jira', title: 'Jira tickets', note: 'Open work assigned in Jira.' };
+    case 'confluence':
+    case 'google-drive':
+    case 'drive':
+      return { key: 'docs', title: 'Documentation and files', note: 'Pages in Confluence and files in Google Drive.' };
+    case 'workday':
+      return { key: 'workday', title: 'Workday', note: 'Approvals, reports and payroll tasks in Workday.' };
+    case 'calendar':
+      return { key: 'meetings', title: 'Meetings and people', note: 'Regular meetings from Calendar.' };
+    case 'pagerduty':
+      return { key: 'oncall', title: 'On-call', note: 'Rotations in PagerDuty.' };
+    default:
+      return { key: 'other', title: 'Other', note: '' };
+  }
+}
+const CATEGORY_ORDER = ['code', 'jira-approvals', 'jira', 'workday', 'oncall', 'docs', 'meetings', 'other', 'manual'];
+
+/** In the leaver's own view, "assigned to Elena" reads "assigned to you". */
+export function forViewer(text: string, name: string, self: boolean): string {
+  return self ? text.replace(new RegExp(`\\b(to|for|by|of) ${name}\\b`, 'g'), '$1 you') : text;
 }
 
 function NextCard({ c, pov, onTab }: { c: CaseDetail; pov: Pov; onTab: (t: Tab) => void }) {
@@ -196,8 +204,6 @@ function NextCard({ c, pov, onTab }: { c: CaseDetail; pov: Pov; onTab: (t: Tab) 
       return card(
         c.turns.length ? 'Continue the interview' : 'Next: the interview',
         `${left} ${left === 1 ? 'topic' : 'topics'} left, most important first. Type, speak, or record your screen. About ${Math.max(5, left * 4)} minutes.`,
-        c.turns.length ? 'Continue the interview' : 'Start the interview',
-        'interview',
       );
     }
     if (c.status === 'REVIEW') return card('Your handover notes are ready', `Read them and point out anything wrong or private before ${c.person.managerName ?? 'your manager'} publishes them.`, 'Read your notes', 'pack');
@@ -240,7 +246,6 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
   const [adding, setAdding] = useState(false);
   const [removing, setRemoving] = useState<string | null>(null);
   const name = firstName(c.person.name);
-  const manager = firstName(c.person.managerName ?? 'Your manager');
 
   async function dismiss(item: Item) {
     setRemoving(item.id);
@@ -253,25 +258,34 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
 
   const tools = [...new Set(c.items.filter((i) => i.origin !== 'manual').map((i) => SOURCE[i.source] ?? i.source))];
   const found = tools.length ? `Found in ${tools.length > 1 ? `${tools.slice(0, -1).join(', ')} and ${tools[tools.length - 1]}` : tools[0]}.` : 'Nothing was found in the connected tools.';
-  const groups = groupsFor(self, pov, name, manager, formatDate(c.person.lastDay))
-    .map((g) => ({ ...g, items: c.items.filter((i) => itemState(i) === g.state).sort((a, b) => (b.riskScore ?? 0) - (a.riskScore ?? 0)) }))
-    .filter((g) => g.items.length);
+  const byKey = new Map<string, Category & { items: Item[] }>();
+  for (const i of c.items) {
+    const cat = categoryOf(i);
+    if (!byKey.has(cat.key)) byKey.set(cat.key, { ...cat, items: [] });
+    byKey.get(cat.key)!.items.push(i);
+  }
+  const groups = [...byKey.values()]
+    .sort((a, b) => CATEGORY_ORDER.indexOf(a.key) - CATEGORY_ORDER.indexOf(b.key))
+    .map((g) => ({ ...g, items: g.items.sort((a, b) => (b.riskScore ?? 0) - (a.riskScore ?? 0)) }));
+  const leaverCanStart = self && c.status === 'INTERVIEWING';
 
-  const row = (item: Item, state: ItemState) => (
+  const row = (item: Item, state: ItemState = itemState(item)) => (
     <li className="oi" key={item.id}>
       <div className="ot">
         {item.url ? (
           <a href={item.url} target="_blank" rel="noreferrer">
-            <b>{item.title}</b>
+            <b>{forViewer(item.title, name, self)}</b>
           </a>
         ) : (
-          <b>{item.title}</b>
+          <b>{forViewer(item.title, name, self)}</b>
         )}
         <span className="src">
           {item.origin === 'manual' ? `${KIND[item.kind] ?? item.kind}, added by ${item.addedBy ?? 'hand'}` : `${KIND[item.kind] ?? item.kind} in ${SOURCE[item.source] ?? item.source}`}
         </span>
       </div>
-      <p className="or">{why(item, self)}</p>
+      <p className="or">
+        <State state={state} /> {why(item, self)}
+      </p>
       {item.ownershipShare !== null && (
         <div className="share">
           <span className="meter">
@@ -302,16 +316,28 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
           {pov !== 'newhire' && (self ? ' Remove anything that isn\u2019t yours and add what the tools can\u2019t see, like favours people rely on you for.' : ` Remove anything that isn\u2019t ${name}\u2019s and add what the tools can\u2019t see.`)}
         </p>
 
+        {leaverCanStart && (
+          <div className="confirm">
+            <div>
+              <b>Is everything correct?</b>
+              <span>Remove what isn&rsquo;t yours with &ldquo;Not mine&rdquo;, add anything missing below, then start the interview.</span>
+            </div>
+            <button className="btn" onClick={() => onTab('interview')}>
+              {c.turns.length ? 'Continue the interview' : 'Looks right. Start the interview'}
+            </button>
+          </div>
+        )}
+
         {groups.map((g) => (
-          <section className={`og g-${g.state}`} key={g.state}>
+          <section className="og" key={g.key}>
             <header>
               <h3>
                 {g.title}
                 <span className="cnt">{g.items.length}</span>
               </h3>
-              <p>{g.note}</p>
+              {g.note && <p>{g.note}</p>}
             </header>
-            <ul>{g.items.map((i) => row(i, g.state))}</ul>
+            <ul>{g.items.map((i) => row(i))}</ul>
           </section>
         ))}
 
