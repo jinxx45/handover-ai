@@ -22,14 +22,14 @@ from .retrieval import Chunk
 log = logging.getLogger(__name__)
 
 PACK_SECTIONS = [
-    ("overview", "Role overview"),
-    ("systems", "Systems and services owned"),
-    ("recurring", "Recurring duties"),
-    ("approvals", "Approvals and responsibilities to reassign"),
-    ("people", "Key people and customers"),
-    ("open_work", "Open work and decisions in flight"),
-    ("landmines", "Known landmines and workarounds"),
-    ("links", "Where everything lives"),
+    ("overview", "About the role"),
+    ("systems", "Systems they own"),
+    ("recurring", "Regular tasks"),
+    ("approvals", "Approvals to hand over"),
+    ("people", "People to know"),
+    ("open_work", "Work in progress"),
+    ("landmines", "What goes wrong and how to fix it"),
+    ("links", "Links"),
 ]
 
 
@@ -96,37 +96,36 @@ class MockLlm:
         first = person.split()[0]
         if item.kind == "recurring_task":
             return (
-                f"{first}, '{item.title}' looks like a recurring duty with no runbook. "
-                "Walk me through it: when does it run, what are the exact steps, and what usually goes wrong?"
+                f"{first}, you run '{item.title}' and the steps aren't written down. "
+                "When does it happen, what are the steps, and what usually goes wrong?"
             )
         if item.kind == "approval":
             return (
-                f"{first}, you approve '{item.title}'. How do you decide: what do you check before approving, "
-                "what makes you reject one, and who should take over this approval after you leave?"
+                f"{first}, '{item.title}' needs a new owner when you leave. What do you check before you approve, "
+                "when do you say no, and who should take it over?"
             )
         if item.kind == "oncall":
             return (
-                f"You're on '{item.title}'. What are the alerts that actually matter, what do you do first when you're paged, "
-                "and who should replace you on the rotation?"
+                f"You're on '{item.title}'. Which alerts really matter, what do you do first, "
+                "and who should take your place?"
             )
         if item.kind == "customer":
             return (
-                f"What does your successor need to know about {item.title}? "
-                "Who is the main contact, what have you promised them, and what upsets them?"
+                f"What should the next person know about {item.title}? "
+                "Who is the main contact, and what have you promised them?"
             )
         if item.kind in ("service", "repo"):
-            detail = f" ({item.activity} changes in the last 90 days)" if item.activity else ""
             return (
-                f"'{item.title}'{detail} has no runbook. When it breaks, what do you check first, "
-                "and is there anything non-obvious about how it is deployed or configured?"
+                f"{first}, there's no runbook for {item.title}. When it breaks, what do you check first, "
+                "and is there anything unusual about how it's released or set up?"
             )
         if item.kind in ("ticket_queue", "ticket"):
-            return f"For '{item.title}', which open items matter most, and what is the next step on each?"
-        return f"What should your successor know about '{item.title}' that is not written down anywhere?"
+            return f"For '{item.title}', which ones matter most, and what is the next step on each?"
+        return f"What should the next person know about '{item.title}' that isn't written down?"
 
     def followup(self, item: Item, question: str, answer: str) -> Optional[str]:
         if len(answer.split()) < 12:
-            return f"Could you add a bit more on '{item.title}'? For example, who to call if it fails, or a command or link to start from."
+            return "Can you add a little more? For example, who to call when it fails, or a link to start from."
         return None
 
     def draft_pack(self, person, role, items, analysis, answers, evidence) -> KnowledgePack:
@@ -150,12 +149,12 @@ class MockLlm:
         sections.append(
             PackSection(
                 key="overview",
-                heading="Role overview",
+                heading="About the role",
                 body=(
-                    f"{person}{' (' + role + ')' if role else ''} owned {len(items)} items across "
-                    f"{len({i.source for i in items})} tools. {len(high)} were high risk (busy and undocumented) "
-                    f"and were covered in {len(answers)} interview answers."
-                    + (f" {sum(i.needs_reassignment for i in items)} approvals or duties must be handed to a new owner."
+                    f"{person}{' (' + role + ')' if role else ''} owns {len(items)} things across "
+                    f"{len({i.source for i in items})} tools. {len(high)} of them weren't written down anywhere, "
+                    f"so the interview covered them in {len(answers)} answers."
+                    + (f" {sum(i.needs_reassignment for i in items)} approvals or duties need a new owner."
                        if any(i.needs_reassignment for i in items) else "")
                 ),
                 citations=overview_cites,
@@ -172,16 +171,16 @@ class MockLlm:
                 best = max(ans, key=lambda a: len(a.answer)) if ans else None
                 note = f": {_short(best.answer, 140)}" if best else (f": {_short(ev_by_item[i.id][0].text, 120)}" if ev_by_item.get(i.id) else "")
                 flag = " **Needs a new owner.**" if i.needs_reassignment else ""
-                share = f" ({round(i.ownership_share * 100)}% of changes)" if i.ownership_share and i.ownership_share >= 0.3 else ""
+                share = f" ({round(i.ownership_share * 100)}% of the code changes)" if i.kind in ("service", "repo") and i.ownership_share and i.ownership_share >= 0.3 else ""
                 lines.append(f"- **{name}**{share}{note}{flag}{c_txt}")
             return ("\n".join(lines), cites)
 
         for key, heading, kinds in [
-            ("systems", "Systems and services owned", ("service", "repo")),
-            ("recurring", "Recurring duties", ("recurring_task",)),
-            ("approvals", "Approvals and responsibilities to reassign", ("approval", "oncall")),
-            ("people", "Key people and customers", ("customer", "contact")),
-            ("open_work", "Open work and decisions in flight", ("ticket_queue", "ticket")),
+            ("systems", "Systems they own", ("service", "repo")),
+            ("recurring", "Regular tasks", ("recurring_task",)),
+            ("approvals", "Approvals to hand over", ("approval", "oncall")),
+            ("people", "People to know", ("customer", "contact")),
+            ("open_work", "Work in progress", ("ticket_queue", "ticket")),
         ]:
             body, cites = bullets(kinds)
             if body:
@@ -197,18 +196,18 @@ class MockLlm:
             lm_cites.append(a.id)
         if lm_lines:
             sections.append(
-                PackSection(key="landmines", heading="Known landmines and workarounds", body="\n".join(lm_lines), citations=lm_cites)
+                PackSection(key="landmines", heading="What goes wrong and how to fix it", body="\n".join(lm_lines), citations=lm_cites)
             )
 
         tool = {"github": "GitHub", "jira": "Jira", "confluence": "Confluence", "google-drive": "Google Drive",
                 "drive": "Google Drive", "calendar": "Calendar", "pagerduty": "PagerDuty", "workday": "Workday"}
         link_lines = [f"- [{i.title}]({i.url}), in {tool.get(i.source, i.source)}" for i in items if i.url]
         if link_lines:
-            sections.append(PackSection(key="links", heading="Where everything lives", body="\n".join(link_lines), citations=[]))
+            sections.append(PackSection(key="links", heading="Links", body="\n".join(link_lines), citations=[]))
 
         return KnowledgePack(
-            title=f"Handover pack: {person}",
-            summary=f"What {person.split()[0]}'s successor needs to keep things running, built from {len(evidence)} work artifacts and {len(answers)} interview answers.",
+            title=f"Handover notes: {person}",
+            summary=f"What {person.split()[0]}'s replacement needs to keep things running. Built from {len(evidence)} work records and {len(answers)} interview answers.",
             sections=sections,
         )
 
@@ -219,7 +218,7 @@ class MockLlm:
         parts, cites = [], []
         # Prefer what the person said, then work evidence, then pack prose; never quote the link list.
         rank = {"I": 0, "E": 1, "S": 2}
-        usable = [c for c in chunks if c.label != "Where everything lives"]
+        usable = [c for c in chunks if c.label != "Links"]
         ordered = sorted(usable[:6], key=lambda c: rank.get(c.id[0], 3))
         for c in ordered:
             # For interview chunks, quote what the person said, not the agent's question.
@@ -310,7 +309,7 @@ class ChatLlm:
             f"Write exactly these sections, in order, with these keys and headings: {keys}. Bodies are concise markdown "
             "bullets. Put interview insights about failures and workarounds in 'landmines'. In 'approvals', list every item "
             "with needsReassignment=true: what is approved, the decision criteria from the interview, and that it needs "
-            "a new owner before the last day. Title: 'Handover pack: <name>'.",
+            "a new owner before the last day. Title: 'Handover notes: <name>'.",
             json.dumps(payload, ensure_ascii=False),
         )
         valid = {e.id for e in evidence} | {a.id for a in answers}

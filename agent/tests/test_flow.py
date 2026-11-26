@@ -21,7 +21,7 @@ EVIDENCE = [
 
 
 def start():
-    r = client.post("/runs", json={"caseId": "c1", "personName": "Priya Raman", "role": "Senior engineer", "items": ITEMS, "evidence": EVIDENCE})
+    r = client.post("/runs", json={"caseId": "c1", "personName": "Elena Marsh", "role": "Senior engineer", "items": ITEMS, "evidence": EVIDENCE})
     assert r.status_code == 200, r.text
     return r.json()
 
@@ -40,13 +40,13 @@ def test_full_interview_produces_cited_pack():
     first_item = run["question"]["itemId"]
     other_item = ({"it-1", "it-2"} - {first_item}).pop()
 
-    long_answer = "Run it on the last business day after finance uploads the ledger to S3, then check the totals tab against SAP and email Ravi in finance."
+    long_answer = "Run it every Tuesday after the 10am freeze: merge to main, tag the release, then post the notes and ask Grace in Order Operations to check the order list."
     # A short answer triggers one follow-up on the same item.
     r = client.post(f"/runs/{run['runId']}/answer", json={"answer": "It just runs."}).json()
     assert r["question"]["isFollowup"] is True and r["question"]["itemId"] == first_item
     r = client.post(f"/runs/{run['runId']}/answer", json={"answer": long_answer}).json()
     assert r["question"]["itemId"] == other_item and r["question"]["isFollowup"] is False
-    r = client.post(f"/runs/{run['runId']}/answer", json={"answer": "Check the dead-letter queue first, then restart the consumer; Arun on platform owns the Kafka cluster it reads from."}).json()
+    r = client.post(f"/runs/{run['runId']}/answer", json={"answer": "Check the dead-letter queue first, then restart the consumer; Felix on platform owns the Kafka cluster it reads from."}).json()
     assert r["status"] == "DRAFTED"
     pack = r["pack"]
     keys = [s["key"] for s in pack["sections"]]
@@ -77,7 +77,7 @@ def test_manager_approvals_are_interviewed_and_flagged():
         {"id": "rp-1", "kind": "repo", "title": "payments-api", "source": "github", "activity": 15, "hasDocs": False, "ownershipShare": 0.64},
         {"id": "dc-1", "kind": "doc", "title": "Team wiki", "source": "confluence", "activity": 2, "hasDocs": True},
     ]
-    run = client.post("/runs", json={"caseId": "m1", "personName": "Meera Krishnan", "items": items, "evidence": []}).json()
+    run = client.post("/runs", json={"caseId": "m1", "personName": "Sofia Brandt", "items": items, "evidence": []}).json()
     analysis = {a["itemId"]: a for a in run["analysis"]}
     assert analysis["ap-1"]["needsInterview"] and "reassigned" in analysis["ap-1"]["reason"]
     assert "64%" in analysis["rp-1"]["reason"]
@@ -105,7 +105,7 @@ def test_manual_items_join_and_leave_the_interview():
 
 
 def test_backfill_skills_are_grounded_in_evidence():
-    r = client.post("/skills", json={"personName": "Priya Raman", "role": "Senior engineer", "items": ITEMS, "evidence": EVIDENCE,
+    r = client.post("/skills", json={"personName": "Elena Marsh", "role": "Senior engineer", "items": ITEMS, "evidence": EVIDENCE,
                                      "answers": [{"id": "I1", "itemId": "it-2", "question": "q", "answer": "Check the Kafka dead-letter queue, then replay."}]}).json()
     names = [s["name"] for s in r["skills"]]
     assert any("Kafka" in n for n in names) and any("reconciliation" in n.lower() for n in names)
@@ -116,15 +116,15 @@ def test_backfill_skills_are_grounded_in_evidence():
 
 def test_onboarding_kit_is_specific_to_the_role():
     answers = [
-        {"id": "I1", "itemId": "it-1", "question": "q", "answer": "Run it after finance uploads the ledger; tell Ravi in finance when it goes red."},
-        {"id": "I2", "itemId": "it-2", "question": "q", "answer": "Check the DLQ first. Arun on platform owns the Kafka cluster."},
+        {"id": "I1", "itemId": "it-1", "question": "q", "answer": "Run it after finance uploads the ledger; tell Grace in order operations when it goes red."},
+        {"id": "I2", "itemId": "it-2", "question": "q", "answer": "Check the DLQ first. Felix on platform owns the Kafka cluster."},
     ]
     att = [{"id": "A1", "itemId": "it-1", "turnLabel": "I1", "kind": "video", "url": "/v1/media/recon.webm", "title": "Running the quarter-end recon"}]
-    r = client.post("/onboarding", json={"personName": "Priya Raman", "role": "Senior engineer", "managerName": "Suresh Iyer",
+    r = client.post("/onboarding", json={"personName": "Elena Marsh", "role": "Senior engineer", "managerName": "Marcus Whitfield",
                                          "items": ITEMS, "evidence": EVIDENCE, "answers": answers, "attachments": att}).json()
     tasks = [t for ph in r["phases"] for t in ph["tasks"]]
     assert r["phases"][0]["name"] == "Week 1"
     assert any(t["type"] == "watch" and t["link"] == "/v1/media/recon.webm" for t in tasks)
     names = [p["name"] for p in r["people"]]
-    assert "Suresh Iyer" in names and "Arun" in names and "Ravi" in names
+    assert "Marcus Whitfield" in names and "Felix" in names and "Grace" in names
     assert any("billing-sync" in t["title"] for t in tasks)

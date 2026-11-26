@@ -1,0 +1,82 @@
+{
+  "items": [
+    {
+      "kind": "approval",
+      "title": "Workday time off and expense approvals for 6 people",
+      "source": "workday",
+      "url": null,
+      "activity": 28,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "lastActivityDays": 2,
+      "evidence": [
+        "Sofia approves time off and expense reports for her 6 direct reports in Workday. 28 approvals in the last 6 months, 2 waiting now.",
+        "One waiting expense report is over the team's travel budget."
+      ]
+    },
+    {
+      "kind": "approval",
+      "title": "Approves production access for Workday integrations",
+      "source": "jira",
+      "url": "https://jira.example/issues/?jql=project%3DINT%20AND%20approver%3Dsofia",
+      "activity": 19,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "lastActivityDays": 1,
+      "evidence": [
+        "Sofia approved 17 production access requests in the INT project in the last 6 months. 2 are waiting on her.",
+        "She rejected one request because it had no linked ticket."
+      ]
+    },
+    {
+      "kind": "approval",
+      "title": "Signs off integration releases",
+      "source": "jira",
+      "url": "https://jira.example/browse/INT",
+      "activity": 10,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "lastActivityDays": 4,
+      "evidence": [
+        "Every release of the Workday payroll and benefits integrations needs Sofia's sign-off. 10 releases in the last 6 months.",
+        "She sent two releases back because they had no rollback plan."
+      ]
+    },
+    {
+      "kind": "recurring_task",
+      "title": "Weekly integrations check-in with Payroll",
+      "source": "calendar",
+      "url": null,
+      "activity": 12,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "lastActivityDays": 3,
+      "evidence": [
+        "Sofia runs a weekly 30-minute meeting with the Payroll team to agree on integration changes."
+      ]
+    },
+    {
+      "kind": "doc",
+      "title": "Integration release checklist",
+      "source": "confluence",
+      "url": "https://confluence.example/display/INT/Release",
+      "activity": 6,
+      "hasDocs": true,
+      "evidence": [
+        "A release checklist exists and was last updated 3 weeks ago."
+      ]
+    },
+    {
+      "kind": "approval",
+      "title": "Owner of 12 shared team files",
+      "source": "google-drive",
+      "url": null,
+      "activity": 12,
+      "hasDocs": true,
+      "needsReassignment": true,
+      "evidence": [
+        "Sofia owns the team roadmap, hiring plan and vendor contacts files. Ownership must move before her account is closed."
+      ]
+    }
+  ]
+}

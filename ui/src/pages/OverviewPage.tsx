@@ -60,11 +60,11 @@ function useDrift(ref: React.RefObject<HTMLElement>) {
   }, [ref]);
 }
 
-const HERO_BLOCKS = ['captured', 'risk', 'owner', 'owner', 'risk', 'risk', 'risk', 'documented', 'risk'];
+const HERO_BLOCKS = ['captured', 'risk', 'owner', 'owner', 'risk', 'documented', 'risk'];
 const HERO_ROWS: [string, string, string, string][] = [
-  ['billing-sync service', 'You wrote 61% of it. No runbook.', 'risk', 'Only in your head'],
-  ['Required code reviewer in acme/billing-sync', 'Pull requests wait on you.', 'owner', 'Needs a new owner'],
-  ['Quarter-end revenue reconciliation', 'Captured in your interview.', 'captured', 'Captured'],
+  ['OMS UI (order management web app)', 'You wrote 64% of it. No runbook.', 'risk', 'Only in your head'],
+  ['Required reviewer for checkout code', 'Checkout changes wait on you.', 'owner', 'Needs a new owner'],
+  ['Weekly OMS UI release', 'Explained in your interview.', 'captured', 'Captured'],
 ];
 
 export default function OverviewPage() {
@@ -95,11 +95,11 @@ export default function OverviewPage() {
           <Words text="Nothing walks out the door." delay={0.1} />
         </h1>
         <p className="lede rv" style={{ ['--d' as string]: '.7s' }}>
-          When someone resigns, handover.ai finds what only they know, asks them about it, and gets the next person ready.
+          When someone resigns, handover.ai finds the work only they know, asks them about it, and gets the next person ready.
         </p>
         <div className="ctas rv" style={{ ['--d' as string]: '.9s' }}>
-          <button className="btn lg" disabled={starting !== null} onClick={() => resign('priya')}>
-            {starting === 'priya' && <Spinner />} Watch Priya resign
+          <button className="btn lg" disabled={starting !== null} onClick={() => resign('elena')}>
+            {starting === 'elena' && <Spinner />} Try it: Elena resigns
           </button>
           <Link to="/departures">See all departures</Link>
         </div>
@@ -109,8 +109,8 @@ export default function OverviewPage() {
             <i />
             <i />
           </div>
-          <div className="t">Priya Raman, senior software engineer. 14 days left.</div>
-          <div className="big">Priya owns 9 things. Most of it lives only in her head.</div>
+          <div className="t">Elena Marsh, Senior Software Engineer, OMS UI. 14 days left.</div>
+          <div className="big">Elena owns 7 things. Most of them aren&rsquo;t written down.</div>
           <div className="strip">
             {HERO_BLOCKS.map((b, n) => (
               <i key={n} className={b} style={{ ['--n' as string]: n }} />
@@ -131,16 +131,16 @@ export default function OverviewPage() {
       </section>
 
       <section className="sec white">
-        <h2 className="rv">It already knows what&rsquo;s theirs.</h2>
+        <h2 className="rv">It finds what they own.</h2>
         <p className="lede rv" style={{ ['--d' as string]: '.1s' }}>
-          GitHub, Jira, Confluence, Drive, Calendar and PagerDuty report what a person owns the moment Workday says they&rsquo;re leaving.
+          When Workday records a resignation, handover.ai checks GitHub, Jira, Confluence, Drive, Calendar and PagerDuty for the person&rsquo;s work.
         </p>
         <div className="stats">
           {(
             [
-              [61, '%', 'of billing-sync was written by one engineer'],
-              [46, '', 'production access requests one manager approved'],
-              [8, '', 'people whose time off routes to that same manager'],
+              [64, '%', 'of the OMS UI code was written by one engineer'],
+              [17, '', 'production access requests approved by one manager'],
+              [6, '', 'people whose time off that same manager approves'],
             ] as const
           ).map(([n, u, l], i) => (
             <div className="stat rv" key={l} style={{ ['--d' as string]: `${0.1 + i * 0.12}s` }}>
@@ -154,17 +154,17 @@ export default function OverviewPage() {
       </section>
 
       <section className="sec fog">
-        <h2 className="rv">It only asks what isn&rsquo;t written down.</h2>
+        <h2 className="rv">It asks only about what isn&rsquo;t written down.</h2>
         <p className="lede rv" style={{ ['--d' as string]: '.1s' }}>
-          Riskiest first. Type, talk, or record your screen. Vague answers get a follow-up.
+          Most important first. Type, speak, or record your screen. If an answer is vague, it asks again.
         </p>
         <div className="mock">
-          <div className="bub q rv">The quarter-end reconciliation runs once a quarter. What are the steps, and how do you know it worked?</div>
+          <div className="bub q rv">You run the weekly OMS UI release. What are the steps, and how do you know it worked?</div>
           <div className="bub a rv" style={{ ['--d' as string]: '.35s' }}>
-            Run it after the finance freeze, then check the totals match the ledger.
+            Merge to main on Tuesday, tag the release, then check the order list loads.
           </div>
           <div className="bub fu rv" style={{ ['--d' as string]: '.7s' }}>
-            Can you give one example of a time it went wrong?
+            Who should you tell if the order list doesn&rsquo;t load?
           </div>
         </div>
       </section>
@@ -174,21 +174,21 @@ export default function OverviewPage() {
           <span className="grad">Every fact shows its source.</span>
         </h2>
         <p className="fact rv" style={{ ['--d' as string]: '.15s' }}>
-          The reconciliation must run after the finance freeze, or the totals drift.<sup>Interview</sup> Priya wrote 92% of the script.
+          Release on Tuesday after the 10am code freeze.<sup>Interview</sup> Elena ran 11 of the last 12 releases.
           <sup className="g">GitHub</sup>
         </p>
         <p className="lede rv" style={{ ['--d' as string]: '.3s' }}>
-          And when the answer isn&rsquo;t in the handover, it says so instead of guessing.
+          If the handover doesn&rsquo;t cover something, it says so instead of guessing.
         </p>
       </section>
 
       <section className="sec fog">
-        <h2 className="rv">The next hire starts where she left off.</h2>
+        <h2 className="rv">The next hire starts where she stopped.</h2>
         <p className="lede rv" style={{ ['--d' as string]: '.1s' }}>
-          A job description built from the real work, and a 90-day plan built for one person, not the whole team.
+          A job description based on the real work, and a 90-day plan for this role, not a generic team plan.
         </p>
         <ul className="kitmock rv">
-          {['Meet Ravi Kumar, the Finance controller Priya works with.', 'Shadow, then run, the quarter-end reconciliation.', 'Take over the billing-sync code reviews.'].map((t) => (
+          {['Meet Grace Holloway, the Order Operations lead Elena works with.', 'Watch one OMS UI release, then run the next one.', 'Take over checkout code reviews.'].map((t) => (
             <li key={t}>
               <i aria-hidden="true" />
               {t}
@@ -200,14 +200,14 @@ export default function OverviewPage() {
       <section className="sec black try">
         <h2 className="rv">Try it.</h2>
         <p className="lede rv" style={{ ['--d' as string]: '.1s' }}>
-          Each button sends the same resignation event Workday would.
+          Each button sends the same resignation event that Workday sends.
         </p>
         <div className="row rv" style={{ ['--d' as string]: '.2s' }}>
-          <button className="btn lg" disabled={starting !== null} onClick={() => resign('priya')}>
-            {starting === 'priya' && <Spinner />} Priya resigns
+          <button className="btn lg" disabled={starting !== null} onClick={() => resign('elena')}>
+            {starting === 'elena' && <Spinner />} Elena, an engineer, resigns
           </button>
-          <button className="btn lg on-dark" disabled={starting !== null} onClick={() => resign('meera')}>
-            {starting === 'meera' && <Spinner />} Meera, a manager, resigns
+          <button className="btn lg on-dark" disabled={starting !== null} onClick={() => resign('sofia')}>
+            {starting === 'sofia' && <Spinner />} Sofia, a manager, resigns
           </button>
         </div>
         {error && (

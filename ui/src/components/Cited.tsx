@@ -9,10 +9,15 @@ export interface Sources {
 
 const CITE_RE = /\[((?:E|I|S)\d+)\]/g;
 
+const TOOL: Record<string, string> = {
+  github: 'GitHub', jira: 'Jira', confluence: 'Confluence', 'google-drive': 'Google Drive', drive: 'Google Drive',
+  calendar: 'Calendar', pagerduty: 'PagerDuty', workday: 'Workday', crm: 'CRM', manual: 'Added by hand',
+};
+
 function describe(id: string, sources: Sources): { title: string; text: string } {
   if (id.startsWith('E')) {
     const e = sources.evidence.find((x) => x.label === id);
-    return e ? { title: `Evidence · ${e.source}`, text: e.text } : { title: 'Evidence', text: 'Source not found.' };
+    return e ? { title: `From ${TOOL[e.source] ?? e.source}`, text: e.text } : { title: 'Source', text: 'Source not found.' };
   }
   if (id.startsWith('I')) {
     const t = sources.turns.find((x) => x.label === id);
@@ -22,7 +27,7 @@ function describe(id: string, sources: Sources): { title: string; text: string }
   }
   const n = Number(id.slice(1)) - 1;
   const s = sources.pack?.sections[n];
-  return s ? { title: `Pack · ${s.heading}`, text: s.body.slice(0, 400) } : { title: 'Pack', text: 'Section not found.' };
+  return s ? { title: `Handover notes: ${s.heading}`, text: s.body.slice(0, 400) } : { title: 'Handover notes', text: 'Section not found.' };
 }
 
 export function Cite({ id, sources }: { id: string; sources: Sources }) {

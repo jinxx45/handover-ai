@@ -18,9 +18,10 @@ _NAME_BEFORE = re.compile(
 )
 _NOT_NAMES = {
     "The", "This", "That", "When", "Then", "Check", "Run", "Most", "Every", "Level", "Time", "Expenses", "Limits",
-    "Go", "Prod", "Transfer", "Nothing", "Northwind", "Finance", "Kafka", "Workday", "Jira", "Slack", "Confluence",
-    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "January", "February", "December", "Ledger", "Billing",
-    "Payments", "Suresh's", "Our", "Their", "Only", "Also", "Just", "Make", "Keep",
+    "Go", "Prod", "Transfer", "Nothing", "Finance", "Kafka", "Workday", "Jira", "Slack", "Confluence", "Angular",
+    "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "January", "February", "March", "December", "Payroll",
+    "Payments", "Our", "Their", "Only", "Also", "Just", "Make", "Keep", "Order", "Orders", "Release", "Checkout",
+    "Production", "Staging", "Search", "GitHub", "PagerDuty",
 }
 
 
@@ -58,12 +59,12 @@ def people_to_meet(manager: str | None, items: list[Item], answers: list[Answer]
             if first in found:
                 found[first].name = name
             else:
-                found[name] = KitPerson(name=name, why=f"Key contact: {i.title}.")
+                found[name] = KitPerson(name=name, why=f"Works closely with this role.")
         if i.successor and i.successor.split()[0] not in found and i.successor not in found:
             found[i.successor] = KitPerson(name=i.successor, why=f"Now owns {i.title}.")
     people = list(found.values())
     if manager:
-        people.insert(0, KitPerson(name=manager, why="Your manager; agree what you own by day 30."))
+        people.insert(0, KitPerson(name=manager, why="Your manager. Agree what you own by day 30."))
     return people[:8]
 
 
@@ -86,16 +87,16 @@ def mock_kit(person: str, role: str | None, manager: str | None, items: list[Ite
 
     # ---- week 1: context
     week1: list[KitTask] = [
-        KitTask(title=f"Read {first}'s handover pack", detail="Start with the landmines section; it is what bites first.", type="read", link="#pack"),
+        KitTask(title=f"Read {first}'s handover notes", detail="Start with \"What goes wrong and how to fix it\".", type="read", link="#pack"),
     ]
     for att in attachments:
         video_host = any(h in att.url for h in ("loom.com", "youtube", "youtu.be", "vimeo"))
         looks_like_video = re.search(r"video|recording|walkthrough|demo", att.title, re.I)
         if att.kind in ("video", "audio") or video_host or looks_like_video:
-            week1.append(KitTask(title=f"Watch: {att.title}", detail=f"Recorded by {first} during the handover.", type="watch",
+            week1.append(KitTask(title=f"Watch: {att.title}", detail=f"Recorded by {first}.", type="watch",
                                  link=att.url, item_id=att.item_id, citations=[att.turn_label] if att.turn_label else []))
         else:
-            week1.append(KitTask(title=f"Read: {att.title}", detail=f"Shared by {first} during the handover.", type="read",
+            week1.append(KitTask(title=f"Read: {att.title}", detail=f"Shared by {first}.", type="read",
                                  link=att.url, item_id=att.item_id, citations=[att.turn_label] if att.turn_label else []))
     for i in [i for i in items if i.kind == "doc" and i.url][:2]:
         week1.append(KitTask(title=f"Skim {i.title}", type="read", link=i.url, item_id=i.id))
@@ -110,7 +111,7 @@ def mock_kit(person: str, role: str | None, manager: str | None, items: list[Ite
     for i in [i for i in ranked if i.kind not in ("doc", "contact")][:5]:
         a = best_answer(i.id)
         verb = "Run" if i.kind == "recurring_task" else "Shadow" if i.kind in ("service", "repo", "oncall") else "Learn"
-        detail = _short(a.answer, 200) if a else "Nobody has written this down yet; ask your manager."
+        detail = _short(a.answer, 200) if a else "Not written down yet. Ask your manager."
         weeks2.append(KitTask(title=f"{verb}: {i.title}", detail=detail, type={"Run": "do", "Shadow": "shadow"}.get(verb, "learn"),
                               item_id=i.id, link=i.url, citations=[a.id] if a else []))
 
@@ -118,31 +119,31 @@ def mock_kit(person: str, role: str | None, manager: str | None, items: list[Ite
     own: list[KitTask] = []
     for i in [i for i in items if i.needs_reassignment and not i.successor][:5]:
         a = best_answer(i.id)
-        how = f" How {first} decided: {_short(a.answer, 150)}" if a else ""
-        own.append(KitTask(title=f"Take over: {i.title}", detail=("Confirm the hand-off with your manager." + how).strip(),
+        how = f" How {first} did it: {_short(a.answer, 150)}" if a else ""
+        own.append(KitTask(title=f"Take over: {i.title}", detail=("Agree the handover with your manager." + how).strip(),
                            type="do", item_id=i.id, citations=[a.id] if a else []))
     for sk in [s for s in skills if s.priority == "must"][:4]:
-        own.append(KitTask(title=f"Close the gap: {sk.name}", detail=sk.why, type="learn", citations=sk.citations[:2]))
+        own.append(KitTask(title=f"Learn: {sk.name}", detail=sk.why, type="learn", citations=sk.citations[:2]))
 
     # ---- days 61-90: leave it better than you found it
     better: list[KitTask] = []
     for i in [i for i in ranked if not i.has_docs and i.kind in ("service", "repo", "recurring_task", "oncall")][:3]:
         a = best_answer(i.id)
-        better.append(KitTask(title=f"Write the runbook for {i.title}", detail="There is none today; start from the interview answer." if a else "There is none today.",
+        better.append(KitTask(title=f"Write the runbook for {i.title}", detail="None exists yet. Start from the interview answer." if a else "None exists yet.",
                               type="do", item_id=i.id, citations=[a.id] if a else []))
 
     phases = [
-        KitPhase(name="Week 1", goal="Get the context and meet the people who matter for this role.", tasks=week1),
-        KitPhase(name="Weeks 2 to 4", goal=f"Work alongside the systems and duties {first} carried, riskiest first.", tasks=weeks2),
-        KitPhase(name="Days 31 to 60", goal="Take over approvals and duties, and close the skill gaps that matter.", tasks=own),
-        KitPhase(name="Days 61 to 90", goal="Write down what was only in people's heads.", tasks=better),
+        KitPhase(name="Week 1", goal="Learn the basics and meet the people you will work with.", tasks=week1),
+        KitPhase(name="Weeks 2 to 4", goal=f"Learn {first}'s systems and tasks, most important first.", tasks=weeks2),
+        KitPhase(name="Days 31 to 60", goal="Take over approvals and tasks, and learn the skills you are missing.", tasks=own),
+        KitPhase(name="Days 61 to 90", goal="Write down what is still only in people's heads.", tasks=better),
     ]
     phases = [p for p in phases if p.tasks]
     return OnboardingKit(
-        title=f"Onboarding for the new {role or 'hire'}",
-        intro=(f"Built from the {len(items)} things {first} owned, {len(answers)} interview answers and "
-               f"{len(attachments)} recordings or links. Use it alongside the standard company onboarding; "
-               f"this covers what only this role needs."),
+        title=f"Your first 90 days as {role or 'the new hire'}",
+        intro=(f"Built from the {len(items)} things {first} owned and {len(answers)} interview answers"
+               + (f", plus {len(attachments)} recordings or links" if attachments else "")
+               + ". Use it alongside the standard company onboarding. This covers what only this role needs."),
         phases=phases,
         people=people,
     )

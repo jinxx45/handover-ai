@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
  *
  * <pre>
  * {"specversion":"1.0","type":"person.departed","source":"workday","id":"evt-123",
- *  "data":{"personId":"priya","name":"Priya Raman","email":"priya@acme.com","lastDay":"2026-12-09"}}
+ *  "data":{"personId":"elena","name":"Elena Marsh","email":"elena.marsh@example.com","lastDay":"2026-12-09"}}
  * </pre>
  */
 public record DepartureEvent(

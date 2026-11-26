@@ -6,7 +6,7 @@ import type { Tab } from '../pages/CasePage';
 import { Strip, firstName, formatDate, itemState, type ItemState } from './ui';
 
 const KIND: Record<string, string> = {
-  recurring_task: 'Recurring duty',
+  recurring_task: 'Regular task',
   service: 'Service',
   repo: 'Repository',
   customer: 'Customer',
@@ -73,7 +73,7 @@ function AddItem({ c, onChange, onClose }: { c: CaseDetail; onChange: (c: CaseDe
       <div className="add-grid">
         <label>
           What is it?
-          <input className="field" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Monthly vendor invoice sign-off" />
+          <input className="field" autoFocus value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Monthly Workday report for Finance" />
         </label>
         <label>
           Kind
@@ -87,8 +87,8 @@ function AddItem({ c, onChange, onClose }: { c: CaseDetail; onChange: (c: CaseDe
         </label>
       </div>
       <label>
-        What should the successor know? <span className="faint">(optional, the interview will ask anyway)</span>
-        <textarea className="field" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Runs on the 1st; Finance chases it by the 3rd." />
+        What should the next person know? <span className="faint">(optional, the interview will ask too)</span>
+        <textarea className="field" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Runs on the 1st. Finance asks for it by the 3rd." />
       </label>
       <label className="check">
         <input type="checkbox" checked={reassign} onChange={(e) => setReassign(e.target.checked)} />
@@ -117,9 +117,10 @@ function AddItem({ c, onChange, onClose }: { c: CaseDetail; onChange: (c: CaseDe
 function why(item: Item, self: boolean): string {
   const reasons: string[] = [];
   if (item.needsReassignment) reasons.push(self ? 'Stops working when your account closes' : 'Stops working when their account closes');
-  else if (item.kind === 'recurring_task') reasons.push('Recurring duty with nobody else on it');
-  if (!item.hasDocs && item.kind !== 'doc') reasons.push('No runbook');
-  if (reasons.length < 2 && item.activity >= 10) reasons.push(`${item.activity} changes recently`);
+  else if (item.kind === 'recurring_task') reasons.push('Regular task that nobody else does');
+  if (!item.hasDocs && ['service', 'repo', 'recurring_task', 'oncall'].includes(item.kind)) reasons.push('No runbook');
+  else if (!item.hasDocs && item.kind !== 'doc' && !item.needsReassignment) reasons.push('Not written down');
+  if (reasons.length < 2 && item.activity >= 10 && ['service', 'repo'].includes(item.kind)) reasons.push(`${item.activity} changes recently`);
   if (reasons.length === 0) reasons.push(item.hasDocs ? 'Already written down' : 'Rarely touched');
   return reasons.slice(0, 2).join('. ') + '.';
 }
@@ -166,11 +167,11 @@ function groupsFor(self: boolean, pov: Pov, name: string, manager: string, lastD
     {
       state: 'risk' as ItemState,
       title: self ? 'Only you know how these work' : `Only ${name} knows how these work`,
-      note: self ? 'The interview asks about these, riskiest first.' : `The interview asks ${name} about these, riskiest first.`,
+      note: self ? 'The interview asks you about these, most important first.' : `The interview asks ${name} about these, most important first.`,
     },
-    { state: 'captured' as ItemState, title: 'Captured', note: self ? 'Covered in your interview, or handed to a new owner.' : `Covered in the interview, or handed to a new owner.` },
+    { state: 'captured' as ItemState, title: 'Handed over', note: self ? 'Explained in your interview, or given to a new owner.' : `Explained in the interview, or given to a new owner.` },
     { state: 'documented' as ItemState, title: 'Already written down', note: 'Nothing to do.' },
-    { state: 'low' as ItemState, title: 'Low risk', note: `Rarely touched. Nothing ${you === 'you' ? 'you need' : 'anyone needs'} to do.` },
+    { state: 'low' as ItemState, title: 'Low priority', note: `Rarely touched. Nothing ${you === 'you' ? 'you need' : 'anyone needs'} to do.` },
   ];
 }
 
@@ -189,31 +190,31 @@ function NextCard({ c, pov, onTab }: { c: CaseDetail; pov: Pov; onTab: (t: Tab) 
     </div>
   );
   if (pov === 'leaver') {
-    if (c.status === 'MAPPING') return card('Next: the interview', 'Check this list first. The interview starts once the map is ready.');
+    if (c.status === 'MAPPING') return card('Next: the interview', 'Check this list first. The interview starts once the list is ready.');
     if (c.status === 'INTERVIEWING') {
       const left = (c.currentQuestion?.remaining ?? 0) + 1;
       return card(
         c.turns.length ? 'Continue the interview' : 'Next: the interview',
-        `${left} ${left === 1 ? 'topic' : 'topics'} left, riskiest first. Type, talk, or record your screen. About ${Math.max(5, left * 4)} minutes.`,
+        `${left} ${left === 1 ? 'topic' : 'topics'} left, most important first. Type, speak, or record your screen. About ${Math.max(5, left * 4)} minutes.`,
         c.turns.length ? 'Continue the interview' : 'Start the interview',
         'interview',
       );
     }
-    if (c.status === 'REVIEW') return card('Your pack is written', `Read it once and flag anything wrong or private before ${c.person.managerName ?? 'your manager'} publishes it.`, 'Review your pack', 'pack');
-    if (c.status === 'PUBLISHED') return card('Your handover is published', 'Thank you. Whoever comes next can now ask it questions instead of messaging you.');
+    if (c.status === 'REVIEW') return card('Your handover notes are ready', `Read them and point out anything wrong or private before ${c.person.managerName ?? 'your manager'} publishes them.`, 'Read your notes', 'pack');
+    if (c.status === 'PUBLISHED') return card('Your handover is published', 'Thank you. The next person can now ask it questions instead of messaging you.');
     return card('Something went wrong', `${c.person.managerName ?? 'Your manager'} has been asked to retry.`);
   }
   if (need) {
     return card(
       `${need} ${need === 1 ? 'thing needs' : 'things need'} an owner`,
-      `Name someone for each before ${formatDate(c.person.lastDay)}. Then publish the pack.`,
-      c.pack ? 'Go to the pack' : 'Watch the interview',
+      `Name someone for each before ${formatDate(c.person.lastDay)}. Then publish the notes.`,
+      c.pack ? 'Go to the notes' : 'Follow the interview',
       c.pack ? 'pack' : 'interview',
     );
   }
-  if (c.status === 'REVIEW') return card('Every handoff has an owner', 'The pack is ready for you to publish.', 'Go to the pack', 'pack');
-  if (c.status === 'PUBLISHED') return card('Published', `The new hire can use ${name}\u2019s handover now.`, 'See the onboarding kit', 'onboarding');
-  return card('Every handoff has an owner', `Waiting for ${name} to finish the interview.`, 'Watch the interview', 'interview');
+  if (c.status === 'REVIEW') return card('Everything has an owner', 'The handover notes are ready for you to publish.', 'Go to the notes', 'pack');
+  if (c.status === 'PUBLISHED') return card('Published', `The new hire can use ${name}\u2019s handover now.`, 'See the 90-day plan', 'onboarding');
+  return card('Everything has an owner', `Waiting for ${name} to finish the interview.`, 'Follow the interview', 'interview');
 }
 
 function Sources({ c }: { c: CaseDetail }) {
@@ -282,7 +283,7 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
       <div className="oa">
         {pov === 'manager' && item.needsReassignment && <OwnerField caseId={c.id} item={item} onChange={onChange} />}
         {pov !== 'manager' && item.successor && <span className="who">Goes to {item.successor}</span>}
-        {state === 'captured' && !item.successor && <span className="who ok">{self ? 'Covered in your interview' : 'Covered in the interview'}</span>}
+        {state === 'captured' && !item.successor && <span className="who ok">{self ? 'Explained in your interview' : 'Explained in the interview'}</span>}
         {pov !== 'newhire' && (
           <button className="link-btn not-theirs" onClick={() => dismiss(item)} disabled={removing === item.id}>
             {self ? 'Not mine' : `Not ${name}\u2019s`}
@@ -298,7 +299,7 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
         <h2 className="oh">{self ? 'Is this everything that\u2019s yours?' : pov === 'manager' ? `What ${name} owns` : `What ${name} owned`}</h2>
         <p className="olede">
           {found}
-          {pov !== 'newhire' && (self ? ' Remove anything that isn\u2019t yours and add what the tools can\u2019t see, like the favours people quietly rely on you for.' : ` Remove anything that isn\u2019t ${name}\u2019s and add what the tools can\u2019t see.`)}
+          {pov !== 'newhire' && (self ? ' Remove anything that isn\u2019t yours and add what the tools can\u2019t see, like favours people rely on you for.' : ` Remove anything that isn\u2019t ${name}\u2019s and add what the tools can\u2019t see.`)}
         </p>
 
         {groups.map((g) => (

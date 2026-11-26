@@ -7,16 +7,16 @@ import type { CaseDetail, CaseStatus, DemoPerson } from '../types';
 const SAFE: ItemState[] = ['captured', 'documented', 'low'];
 const TILE_ORDER: ItemState[] = ['captured', 'documented', 'low', 'owner', 'risk'];
 const STAGES: { key: CaseStatus; label: string }[] = [
-  { key: 'MAPPING', label: 'Mapped' },
+  { key: 'MAPPING', label: 'Found work' },
   { key: 'INTERVIEWING', label: 'Interview' },
-  { key: 'REVIEW', label: 'Pack' },
+  { key: 'REVIEW', label: 'Review' },
   { key: 'PUBLISHED', label: 'Published' },
 ];
 const KEY: ItemState[] = ['captured', 'documented', 'owner', 'risk'];
 
 function tileNote(state: ItemState, successor: string | null) {
   if (state === 'owner') return 'Needs owner';
-  if (state === 'risk') return 'Not captured';
+  if (state === 'risk') return 'Not written down';
   if (successor) return `To ${firstName(successor)}`;
   return STATE_LABEL[state];
 }
@@ -30,7 +30,7 @@ function DepartureCard({ c }: { c: CaseDetail }) {
   const safe = items.filter((i) => SAFE.includes(itemState(i))).length;
   const owner = items.filter((i) => itemState(i) === 'owner').length;
   const head = items.filter((i) => itemState(i) === 'risk').length;
-  const rest = [owner && `${owner} ${owner === 1 ? 'needs' : 'need'} a new owner`, head && `${head} only in ${name}’s head`].filter(Boolean).join(', ');
+  const rest = [owner && `${owner} ${owner === 1 ? 'needs' : 'need'} a new owner`, head && `${head} not written down`].filter(Boolean).join(', ');
   const stage = c.status === 'FAILED' ? 0 : STAGES.findIndex((s) => s.key === c.status);
   const days = c.person.daysLeft;
 
@@ -55,7 +55,7 @@ function DepartureCard({ c }: { c: CaseDetail }) {
       </header>
       <p className="dc-sum">
         <b>
-          {safe} of {items.length} safe.
+          {safe} of {items.length} handed over.
         </b>{' '}
         {rest ? `${rest[0].toUpperCase()}${rest.slice(1)}.` : 'Ready to publish.'}
       </p>
@@ -131,7 +131,7 @@ export default function DeparturesPage() {
       ? 'Loading departures…'
       : n === 0
         ? 'Nobody is leaving right now.'
-        : `${n} ${n === 1 ? 'person is' : 'people are'} handing over. ${open ? `${open} ${open === 1 ? 'thing isn’t' : 'things aren’t'} safe yet.` : 'Everything is safe.'}`;
+        : `${n} ${n === 1 ? 'person is' : 'people are'} handing over. ${open ? `${open} ${open === 1 ? 'thing isn’t' : 'things aren’t'} handed over yet.` : 'Everything is handed over.'}`;
   const leaving = new Set((cases ?? []).map((c) => c.person.personId));
   const waiting = people.filter((p) => !leaving.has(p.personId));
 
@@ -173,14 +173,14 @@ export default function DeparturesPage() {
                 <li key={i} style={{ ['--n' as string]: i }} />
               ))}
             </ul>
-            <p>When Workday sends a resignation, everything that person owns appears here as tiles. They turn green as the handover is done.</p>
+            <p>When Workday sends a resignation, the person’s work shows up here as tiles. Each tile turns green once it’s handed over.</p>
           </div>
         )
       )}
 
       {waiting.length > 0 && (
         <section className="dnext">
-          <h3>{n ? 'Simulate another resignation' : 'Simulate a resignation'}</h3>
+          <h3>{n ? 'Try another demo resignation' : 'Try a demo resignation'}</h3>
           <div className="dnext-row">
             {waiting.map((p) => (
               <button key={p.personId} className="dperson" disabled={starting !== null} onClick={() => start(p.personId)}>
@@ -198,7 +198,7 @@ export default function DeparturesPage() {
                 <span className="dgo">
                   {starting === p.personId ? (
                     <>
-                      <Spinner /> Mapping
+                      <Spinner /> Starting
                     </>
                   ) : (
                     'Resign'

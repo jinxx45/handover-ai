@@ -12,11 +12,11 @@ export function itemState(i: Item): ItemState {
 }
 
 export const STATE_LABEL: Record<ItemState, string> = {
-  risk: 'Only in their head',
+  risk: 'Not written down',
   owner: 'Needs a new owner',
-  captured: 'Captured',
-  documented: 'Written down',
-  low: 'Low risk',
+  captured: 'Handed over',
+  documented: 'Already documented',
+  low: 'Low priority',
 };
 
 const ORDER: ItemState[] = ['risk', 'owner', 'captured', 'documented', 'low'];
@@ -24,7 +24,7 @@ const ORDER: ItemState[] = ['risk', 'owner', 'captured', 'documented', 'low'];
 /** Legend wording with a count: "1 needs a new owner", "3 need a new owner". */
 export function countLabel(state: ItemState, n: number): string {
   if (state === 'owner') return `${n} ${n === 1 ? 'needs' : 'need'} a new owner`;
-  if (state === 'risk') return `${n} only in their head`;
+  if (state === 'risk') return `${n} not written down`;
   return `${n} ${STATE_LABEL[state].toLowerCase()}`;
 }
 
@@ -75,9 +75,9 @@ export function Runway({ start, lastDay }: { start: string; lastDay: string | nu
 }
 
 const STEPS: { key: CaseStatus; label: string }[] = [
-  { key: 'MAPPING', label: 'Map what they own' },
+  { key: 'MAPPING', label: 'Find what they own' },
   { key: 'INTERVIEWING', label: 'Interview' },
-  { key: 'REVIEW', label: 'Review the pack' },
+  { key: 'REVIEW', label: 'Check the notes' },
   { key: 'PUBLISHED', label: 'Published' },
 ];
 

@@ -286,7 +286,7 @@ public class CaseService {
     public CaseViews.QuestionView ask(String caseId, String question, String askedBy) {
         HandoverCase c = find(caseId);
         if (c.getStatus() != CaseStatus.PUBLISHED && c.getStatus() != CaseStatus.REVIEW) {
-            throw new ConflictException("The handover pack is not drafted yet");
+            throw new ConflictException("The handover notes are not written yet");
         }
         AgentDtos.AskResponse r = agent.ask(new AgentDtos.AskRequest(question.trim(), readJson(c.getPackJson()),
                 agentEvidence(c.getId()), agentAnswers(c.getId())));

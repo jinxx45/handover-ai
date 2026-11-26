@@ -55,8 +55,8 @@ export default function InterviewTab({
         <div className="turns">
           {c.turns.length === 0 && interviewing && (
             <p className="muted small" style={{ paddingTop: 18 }}>
-              {self ? 'The agent has already read your' : `The agent has already read ${name}\u2019s`} repositories, tickets
-              and documents. It only asks about the {topics.length} things none of them explain.
+              {self ? 'handover.ai has already read your' : `handover.ai has already read ${name}\u2019s`} code, tickets
+              and documents. It only asks about the {topics.length} things they don&rsquo;t explain.
             </p>
           )}
           {c.turns.map((t) => (
@@ -97,12 +97,12 @@ export default function InterviewTab({
           )}
           {busy && (
             <div className="thinking">
-              <Spinner /> {busy === 'finish' ? 'Writing the handover pack' : 'Reading the answer'}
+              <Spinner /> {busy === 'finish' ? 'Writing the handover notes' : 'Reading the answer'}
             </div>
           )}
           {!interviewing && (
             <p className="note done" style={{ margin: '18px 0 4px' }}>
-              Interview finished with {c.turns.length} answers. The handover pack is drafted.
+              Interview finished with {c.turns.length} answers. The handover notes are written.
             </p>
           )}
           <div ref={end} />
@@ -137,7 +137,7 @@ export default function InterviewTab({
             {voice.error && <p className="note error">{voice.error}</p>}
             <div className="row">
               <button className="link-btn small" onClick={() => run('finish')} disabled={busy !== null}>
-                Stop here and write the pack
+                Finish and write the notes
               </button>
               <div style={{ display: 'flex', gap: 8 }}>
                 {voice.supported && (
@@ -160,7 +160,7 @@ export default function InterviewTab({
       </div>
 
       <div className="topics">
-        <h3>Topics, riskiest first</h3>
+        <h3>Topics, most important first</h3>
         <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {topics.map((i) => {
           const done = i.coverage === 'INTERVIEWED';

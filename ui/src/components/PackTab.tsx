@@ -34,11 +34,11 @@ export default function PackTab({ c, onChange, pov }: { c: CaseDetail; onChange:
       {c.status === 'REVIEW' && pov === 'leaver' && (
         <div className="approve">
           <div>
-            <h3>Read it before it goes out</h3>
+            <h3>Check your notes before they&rsquo;re shared</h3>
             <p className="small muted" style={{ marginTop: 4, maxWidth: '60ch' }}>
-              This is written from your answers and your work. If something is wrong or private, tell{' '}
-              {c.person.managerName ?? 'your manager'} before they publish it. You can still add a recording or link
-              from the interview tab.
+              These notes come from your answers and your work. If anything is wrong or private, tell{' '}
+              {c.person.managerName ?? 'your manager'} before they publish. You can still add a recording or link
+              in the Interview step.
             </p>
           </div>
         </div>
@@ -46,11 +46,11 @@ export default function PackTab({ c, onChange, pov }: { c: CaseDetail; onChange:
       {c.status === 'REVIEW' && pov === 'manager' && (
         <div className="approve">
           <div>
-            <h3>Review and publish</h3>
+            <h3>Check and publish</h3>
             <p className="small muted" style={{ marginTop: 4, maxWidth: '56ch' }}>
-              {name} checks it for anything wrong or private, then their manager publishes it for the successor.
+              {name} checks the notes first. Then you publish them for the person taking over.
               {c.stats.toReassign > 0 &&
-                ` ${c.stats.toReassign} ${c.stats.toReassign === 1 ? 'duty still has' : 'duties still have'} no new owner; you can publish now and assign them before the last day.`}
+                ` ${c.stats.toReassign} ${c.stats.toReassign === 1 ? 'task still has' : 'tasks still have'} no new owner. You can publish now and name owners before the last day.`}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end' }}>

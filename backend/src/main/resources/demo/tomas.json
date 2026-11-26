@@ -1,0 +1,42 @@
+{
+  "items": [
+    {
+      "kind": "recurring_task",
+      "title": "Monthly payroll check before pay day",
+      "source": "workday",
+      "url": null,
+      "activity": 12,
+      "hasDocs": false,
+      "lastActivityDays": 4,
+      "evidence": [
+        "Every month, three days before pay day, Tomas runs a Workday report and fixes any pay that differs from last month by more than 10%.",
+        "Nobody else has run this check in the last year."
+      ]
+    },
+    {
+      "kind": "service",
+      "title": "Workday report: Pay differences this month",
+      "source": "workday",
+      "url": null,
+      "activity": 8,
+      "hasDocs": false,
+      "lastActivityDays": 4,
+      "ownershipShare": 1.0,
+      "evidence": [
+        "Tomas built and owns this custom Workday report. It is shared with the Payroll team."
+      ]
+    },
+    {
+      "kind": "contact",
+      "title": "Ines Calder (payroll vendor contact)",
+      "source": "calendar",
+      "url": null,
+      "activity": 5,
+      "hasDocs": true,
+      "lastActivityDays": 10,
+      "evidence": [
+        "Monthly call with Ines Calder at the payroll vendor. Notes are kept in the shared Payroll folder."
+      ]
+    }
+  ]
+}

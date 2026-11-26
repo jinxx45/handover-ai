@@ -1,28 +1,28 @@
 [
   {
-    "personId": "priya",
-    "name": "Priya Raman",
-    "email": "priya.raman@acme.example",
-    "role": "Senior Software Engineer, Billing Platform",
-    "managerName": "Suresh Iyer",
+    "personId": "elena",
+    "name": "Elena Marsh",
+    "email": "elena.marsh@example.com",
+    "role": "Senior Software Engineer, OMS UI",
+    "managerName": "Marcus Whitfield",
     "noticeDays": 14,
     "exitType": "voluntary"
   },
   {
-    "personId": "meera",
-    "name": "Meera Krishnan",
-    "email": "meera.k@acme.example",
-    "role": "Engineering Manager, Payments",
-    "managerName": "Anand Rao",
+    "personId": "sofia",
+    "name": "Sofia Brandt",
+    "email": "sofia.brandt@example.com",
+    "role": "Engineering Manager, Workday Integrations",
+    "managerName": "Henrik Dahl",
     "noticeDays": 30,
     "exitType": "voluntary"
   },
   {
-    "personId": "karthik",
-    "name": "Karthik Subramanian",
-    "email": "karthik.s@acme.example",
-    "role": "Customer Success Manager, Enterprise",
-    "managerName": "Divya Menon",
+    "personId": "tomas",
+    "name": "Tomas Varga",
+    "email": "tomas.varga@example.com",
+    "role": "Workday Payroll Analyst",
+    "managerName": "Clara Novak",
     "noticeDays": 21,
     "exitType": "voluntary"
   }

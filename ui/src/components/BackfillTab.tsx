@@ -57,11 +57,11 @@ export default function BackfillTab({ c, onChange }: { c: CaseDetail; onChange: 
       <div className="backfill-empty">
         {busy ? (
           <p className="thinking">
-            <Spinner /> Reading {name}&apos;s repositories, documents, approvals and answers
+            <Spinner /> Reading {name}&apos;s work to find the skills the role needs
           </p>
         ) : (
           <button className="btn" onClick={generate}>
-            Work out the skills
+            Find the skills for this role
           </button>
         )}
         {error && <p className="note error">{error}</p>}
@@ -80,8 +80,8 @@ export default function BackfillTab({ c, onChange }: { c: CaseDetail; onChange: 
           <h2>{b.title}</h2>
           <p className="bf-summary">{b.summary}</p>
           <p className="small muted">
-            {musts} must-have and {b.skills.length - musts} nice-to-have skills, each traced to {name}&apos;s actual work.
-            Interview answers make this sharper, so check it again after the interview.
+            {musts} must-have and {b.skills.length - musts} nice-to-have skills, each based on {name}&apos;s real work.
+            Update it after the interview for a better list.
           </p>
         </div>
         <div className="bf-actions">
@@ -89,7 +89,7 @@ export default function BackfillTab({ c, onChange }: { c: CaseDetail; onChange: 
             {copied ? 'Copied' : 'Copy as job description'}
           </button>
           <button className="link-btn small" onClick={generate} disabled={busy}>
-            {busy ? 'Working it out…' : 'Work it out again'}
+            {busy ? 'Updating…' : 'Update'}
           </button>
         </div>
       </div>

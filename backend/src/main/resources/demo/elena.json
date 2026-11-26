@@ -1,0 +1,95 @@
+{
+  "items": [
+    {
+      "kind": "service",
+      "title": "OMS UI (order management web app)",
+      "source": "github",
+      "url": "https://github.example/orders/oms-ui",
+      "activity": 24,
+      "hasDocs": false,
+      "lastActivityDays": 2,
+      "ownershipShare": 0.64,
+      "evidence": [
+        "Elena made 64% of the changes to oms-ui in the last 6 months. Three other people commit to it.",
+        "There is no runbook. When the order list breaks in production, Elena fixes it.",
+        "Only Elena has changed src/app/checkout/ in the last year.",
+        "oms-ui is written in TypeScript 86% (Angular) and SCSS 14%."
+      ]
+    },
+    {
+      "kind": "recurring_task",
+      "title": "Weekly OMS UI release",
+      "source": "github",
+      "url": "https://github.example/orders/oms-ui/releases",
+      "activity": 12,
+      "hasDocs": false,
+      "lastActivityDays": 5,
+      "evidence": [
+        "Elena ran 11 of the last 12 Tuesday releases by hand.",
+        "The release steps are not written down anywhere."
+      ]
+    },
+    {
+      "kind": "approval",
+      "title": "Required reviewer for checkout code in oms-ui",
+      "source": "github",
+      "url": "https://github.example/orders/oms-ui/blob/main/.github/CODEOWNERS",
+      "activity": 3,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "evidence": [
+        "CODEOWNERS makes Elena the only required reviewer for src/app/checkout/.",
+        "Once her account is closed, nobody can approve checkout changes."
+      ]
+    },
+    {
+      "kind": "oncall",
+      "title": "OMS UI on-call (weekdays)",
+      "source": "pagerduty",
+      "url": null,
+      "activity": 7,
+      "hasDocs": false,
+      "needsReassignment": true,
+      "evidence": [
+        "Elena is on the weekday OMS UI rotation. She handled 7 alerts in the last 90 days, mostly slow order search."
+      ]
+    },
+    {
+      "kind": "ticket_queue",
+      "title": "Open OMS tickets assigned to Elena",
+      "source": "jira",
+      "url": "https://jira.example/issues/?jql=project%3DOMS%20AND%20assignee%3Delena",
+      "activity": 9,
+      "hasDocs": false,
+      "lastActivityDays": 1,
+      "evidence": [
+        "OMS-214 (In progress): Order search takes 8 seconds for large customers.",
+        "OMS-220 (To do): Upgrade Angular before the old version loses support in March."
+      ]
+    },
+    {
+      "kind": "doc",
+      "title": "OMS UI setup guide",
+      "source": "confluence",
+      "url": "https://confluence.example/display/OMS/Setup",
+      "activity": 2,
+      "hasDocs": true,
+      "lastActivityDays": 60,
+      "evidence": [
+        "A setup guide covers local install, environment variables and running tests. It is up to date."
+      ]
+    },
+    {
+      "kind": "contact",
+      "title": "Grace Holloway (Order Operations lead)",
+      "source": "calendar",
+      "url": null,
+      "activity": 6,
+      "hasDocs": false,
+      "lastActivityDays": 7,
+      "evidence": [
+        "Weekly 30-minute meeting between Elena and Grace Holloway to agree which OMS fixes go in the next release."
+      ]
+    }
+  ]
+}

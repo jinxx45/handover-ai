@@ -19,12 +19,12 @@ export default function AskTab({ c }: { c: CaseDetail }) {
       .map((i) =>
         i.title.startsWith('Approves ')
           ? `How do I decide on ${i.title.slice(9, 10).toLowerCase()}${i.title.slice(10)}?`
-          : `What do I need to know about "${i.title}"?`,
+          : `How did ${name} handle ${i.title.charAt(0).toLowerCase()}${i.title.slice(1)}?`,
       ),
     ...c.items
       .filter((i) => i.needsInterview && i.kind !== 'approval')
       .slice(0, 2)
-      .map((i) => `What should I know about ${i.title}?`),
+      .map((i) => (i.kind === 'recurring_task' ? `How do I run the ${i.title.charAt(0).toLowerCase()}${i.title.slice(1)}?` : `What should I know about ${i.title}?`)),
   ];
 
   async function ask(q: string) {
@@ -43,13 +43,13 @@ export default function AskTab({ c }: { c: CaseDetail }) {
     }
   }
 
-  if (!c.pack) return <p className="muted">Questions open once the pack is written.</p>;
+  if (!c.pack) return <p className="muted">You can ask questions once the handover notes are written.</p>;
 
   return (
     <div className="ask">
       <p className="muted" style={{ maxWidth: '64ch', marginBottom: 14 }}>
-        Ask what you would have asked {name}. Answers come only from the pack, the interview and the linked work, with
-        sources. If it isn&apos;t covered, you&apos;ll be told so.
+        Ask what you would have asked {name}. Answers come only from the handover notes, the interview and {name}&apos;s
+        work, and show where each fact came from. If something isn&apos;t covered, it says so.
       </p>
       <form
         onSubmit={(e) => {
@@ -59,7 +59,7 @@ export default function AskTab({ c }: { c: CaseDetail }) {
       >
         <input
           className="field"
-          placeholder={`Ask ${name}'s handover`}
+          placeholder={`Ask about ${name}'s work`}
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           disabled={busy}
@@ -94,7 +94,7 @@ export default function AskTab({ c }: { c: CaseDetail }) {
                 <CitedText text={q.answer} sources={sources} />
               </p>
             ) : (
-              <p className="uncovered">Not covered in the handover. Ask {c.person.managerName ?? 'the manager'}, then add it to the pack.</p>
+              <p className="uncovered">Not covered in the handover. Ask {c.person.managerName ?? 'your manager'}.</p>
             )}
           </div>
         ))}

@@ -38,7 +38,7 @@ public record HandoverProperties(
         }
     }
 
-    /** baseUrl like https://acme.atlassian.net/wiki (Cloud) or https://confluence.acme.com (Server/DC). */
+    /** baseUrl like https://example.atlassian.net/wiki (Cloud) or https://confluence.example.com (Server/DC). */
     public record Confluence(String baseUrl, String email, String token) {
         public boolean configured() {
             return present(baseUrl) && present(token);

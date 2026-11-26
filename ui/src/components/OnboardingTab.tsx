@@ -81,11 +81,11 @@ export default function OnboardingTab({ c, onChange, pov }: { c: CaseDetail; onC
       <div className="backfill-empty">
         {busy ? (
           <p className="thinking">
-            <Spinner /> Building the onboarding kit from {name}&apos;s work
+            <Spinner /> Building the 90-day plan from {name}&apos;s work
           </p>
         ) : (
           <button className="btn" onClick={generate}>
-            Build the onboarding kit
+            Build the 90-day plan
           </button>
         )}
         {error && <p className="note error">{error}</p>}
@@ -101,7 +101,7 @@ export default function OnboardingTab({ c, onChange, pov }: { c: CaseDetail; onC
     <div className="kit">
       <div className="bf-head">
         <div>
-          <p className="small muted">{forYou ? `Built from ${name}\u2019s work, for you` : `For whoever takes over from ${name}`}</p>
+          <p className="small muted">{forYou ? `Built from ${name}\u2019s work, for you` : `For the person taking over from ${name}`}</p>
           <h2>{k.title}</h2>
           <p className="bf-summary">{k.intro}</p>
           <p className="small muted num">
@@ -121,7 +121,7 @@ export default function OnboardingTab({ c, onChange, pov }: { c: CaseDetail; onC
           </button>
           {!forYou && (
             <button className="link-btn small" onClick={generate} disabled={busy}>
-              {busy ? 'Rebuilding…' : 'Rebuild with the latest answers'}
+              {busy ? 'Updating…' : 'Update with the latest answers'}
             </button>
           )}
         </div>

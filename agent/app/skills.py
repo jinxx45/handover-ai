@@ -24,23 +24,28 @@ class _Rule:
 
 def _rules() -> list[_Rule]:
     return [
+        _Rule("Angular and TypeScript", "Technical", r"\bangular\b|typescript|\bscss\b", "Builds and fixes the Angular web app"),
+        _Rule("Workday reports and business processes", "Technical", r"workday report|custom workday|business process|in workday", "Builds Workday reports and runs approvals in Workday"),
+        _Rule("Workday integrations", "Technical", r"integration", "Releases and supports Workday integrations"),
         _Rule("Kafka and event-driven services", "Technical", r"\bkafka\b|dead-letter|\bdlq\b|consumer|topic", "Runs services that consume and replay Kafka events"),
         _Rule("Kotlin / JVM services", "Technical", r"\bkotlin\b|\.kt\b|\bjvm\b|\bjava\b|spring", "Maintains JVM service code"),
         _Rule("Python scripting", "Technical", r"\bpython\b|\.py\b", "Owns Python scripts that run business processes"),
         _Rule("AWS (S3) and cloud data", "Technical", r"\bs3\b|\baws\b|s3://", "Reads and writes data in cloud storage"),
         _Rule("SQL and relational data", "Technical", r"\bsql\b|postgres|ledger|query", "Reconciles and queries business data"),
-        _Rule("Incident response and on-call", "Technical", r"on-call|incident|escalation|paged|pagerduty", "Sits on an on-call rotation and handles incidents", ("oncall",)),
-        _Rule("Code review and repository ownership", "Technical", r"codeowners|required reviewer|pull request", "Is a required reviewer, so changes wait on their approval"),
-        _Rule("Release management", "Responsibility", r"release|go/no-go|deploy|rollout", "Decides or runs releases"),
-        _Rule("Change management (CAB)", "Responsibility", r"change request|\bcab\b|rollback", "Approves production changes and their rollback plans"),
-        _Rule("Access governance", "Responsibility", r"production access|break-glass|access request", "Approves who gets production access and for how long"),
-        _Rule("Approvals and sign-offs", "Responsibility", r"approv", "Signs off requests that stop without them", ("approval",)),
-        _Rule("Recurring operational duties", "Responsibility", r"quarter|monthly|weekly|last business day|recurring", "Runs time-boxed duties others depend on", ("recurring_task",)),
-        _Rule("Billing and payments domain", "Domain", r"billing|invoice|payment|payments", "Understands how invoices and payments flow"),
+        _Rule("On-call support", "Technical", r"on-call|incident|escalation|paged|pagerduty", "Responds to alerts on the on-call rotation", ("oncall",)),
+        _Rule("Code review", "Technical", r"codeowners|required reviewer|pull request", "Is a required reviewer, so changes wait on their approval"),
+        _Rule("Running releases", "Responsibility", r"release|go/no-go|deploy|rollout", "Plans and runs releases"),
+        _Rule("Release sign-off", "Responsibility", r"change request|\bcab\b|rollback", "Approves production changes and checks their rollback plans"),
+        _Rule("Production access approvals", "Responsibility", r"production access|break-glass|access request", "Approves who gets production access and for how long"),
+        _Rule("Approvals", "Responsibility", r"approv", "Approves requests that wait on them", ("approval",)),
+        _Rule("Regular scheduled tasks", "Responsibility", r"quarter|monthly|weekly|last business day|recurring", "Does tasks on a schedule that others depend on", ("recurring_task",)),
+        _Rule("Billing and payments", "Domain", r"billing|invoice|payment|payments", "Understands how invoices and payments flow"),
         _Rule("Finance reconciliation", "Domain", r"reconcil|ledger|fx\b|revenue", "Reconciles revenue against the ledger with Finance"),
         _Rule("Fraud and transaction risk", "Domain", r"fraud|transaction limit|limits", "Owns rules that limit risky transactions"),
-        _Rule("Enterprise customer management", "People", r"customer|renewal|northwind|contoso", "Keeps commitments with named customers", ("customer",)),
-        _Rule("Stakeholder communication", "People", r"finance lead|controller|notice before|recon sync|stakeholder|go/no-go", "Coordinates with Finance and other teams", ("contact",)),
+        _Rule("Order management", "Domain", r"\boms\b|order list|order search|orders?\b", "Knows how orders move through the order management system"),
+        _Rule("Payroll", "Domain", r"payroll|pay day|\bpay\b", "Knows how payroll runs and what to check before pay day"),
+        _Rule("Customer relationships", "People", r"renewal|account plan|customer success", "Keeps commitments with named customers", ("customer",)),
+        _Rule("Working with other teams", "People", r"finance lead|controller|notice before|recon sync|stakeholder|go/no-go|operations lead|vendor|check-in", "Agrees priorities and changes with other teams", ("contact",)),
         _Rule("People management", "People", r"direct reports|time off|headcount|1:1|team okrs", "Manages a team and approves their requests"),
     ]
 
@@ -92,9 +97,9 @@ def mock_profile(person: str, role: str | None, items: list[Item], evidence: lis
         skills.append(Skill(name=r.name, category=r.category, priority="must" if must else "nice",
                             why=r.why + ".", citations=r.hits[:4]))
     first = person.split()[0]
-    musts = [s.name[0].lower() + s.name[1:] if not s.name.split()[0].isupper() and s.name.split()[0] not in ("Kafka", "Python", "Kotlin", "SQL", "AWS") else s.name for s in skills if s.priority == "must"][:3]
+    musts = [s.name[0].lower() + s.name[1:] if not s.name.split()[0].isupper() and s.name.split()[0] not in ("Kafka", "Python", "Kotlin", "SQL", "AWS", "Angular", "Workday") else s.name for s in skills if s.priority == "must"][:3]
     summary = (
-        f"Takes over what {first} owns today: {len(items)} systems, duties and approvals. "
-        f"The work leans on {', '.join(musts)}."
+        f"Takes over {first}'s {len(items)} systems, tasks and approvals. "
+        f"The most important skills are {', '.join(musts[:-1]) + ' and ' + musts[-1] if len(musts) > 1 else ''.join(musts)}."
     )
     return BackfillProfile(title=role or "Backfill", summary=summary, skills=skills)

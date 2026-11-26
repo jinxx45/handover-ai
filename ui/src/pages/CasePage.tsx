@@ -15,27 +15,26 @@ export type Tab = 'ledger' | 'interview' | 'pack' | 'ask' | 'backfill' | 'onboar
 
 /** Which tabs each person sees. The leaver's are a real sequence, so they render as numbered steps. */
 function tabsFor(pov: Pov, c: CaseDetail): { key: Tab; label: string; disabled?: boolean; done?: boolean }[] {
-  const name = firstName(c.person.name);
   if (pov === 'leaver') {
     return [
       { key: 'ledger', label: 'What you own', done: c.status !== 'MAPPING' },
       { key: 'interview', label: 'Interview', done: c.status === 'REVIEW' || c.status === 'PUBLISHED' },
-      { key: 'pack', label: 'Your pack', disabled: !c.pack, done: c.status === 'PUBLISHED' },
+      { key: 'pack', label: 'Check your handover', disabled: !c.pack, done: c.status === 'PUBLISHED' },
     ];
   }
   if (pov === 'newhire') {
     return [
       { key: 'onboarding', label: 'Your first 90 days' },
-      { key: 'ask', label: `Ask ${name}’s handover` },
-      { key: 'pack', label: 'Handover pack' },
+      { key: 'ask', label: 'Ask a question' },
+      { key: 'pack', label: 'Handover notes' },
     ];
   }
   return [
     { key: 'ledger', label: 'What they own' },
     { key: 'interview', label: `Interview${c.turns.length ? ` (${c.turns.length})` : ''}` },
-    { key: 'pack', label: 'Handover pack', disabled: !c.pack },
-    { key: 'backfill', label: 'Backfill', disabled: c.items.length === 0 },
-    { key: 'onboarding', label: 'Onboarding kit', disabled: c.items.length === 0 },
+    { key: 'pack', label: 'Handover notes', disabled: !c.pack },
+    { key: 'backfill', label: 'Hire a replacement', disabled: c.items.length === 0 },
+    { key: 'onboarding', label: '90-day plan', disabled: c.items.length === 0 },
   ];
 }
 
@@ -189,10 +188,10 @@ export default function CasePage() {
 
         {notPublished ? (
           <div className="waiting fx">
-            <h2>{name}&rsquo;s handover is still being prepared</h2>
+            <h2>{name}&rsquo;s handover isn&rsquo;t ready yet</h2>
             <p className="muted" style={{ marginTop: 8 }}>
-              {name} is {c.status === 'INTERVIEWING' ? 'answering the interview' : 'reviewing the pack'}. {c.person.managerName ?? 'Your manager'}{' '}
-              publishes it before your first day, and your onboarding kit appears here at the same time.
+              {name} is {c.status === 'INTERVIEWING' ? 'still answering questions' : 'checking the notes'}. {c.person.managerName ?? 'Your manager'}{' '}
+              will publish it before your first day, and your 90-day plan will appear here then.
             </p>
           </div>
         ) : (

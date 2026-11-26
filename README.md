@@ -28,7 +28,7 @@ Workday / HRIS ──event──▶ backend ──▶ connectors (GitHub, Jira, 
 ## How the map is built: automatic first, then people
 
 1. **Automatic.** The resignation event triggers every connected tool (see the Connections page). Each returns what the person owns, with evidence.
-2. **The person leaving checks it.** On "What they own" they remove anything that isn't theirs (**Not Priya's**) and add what tools can't see (**Add something**): a promise to a customer, a task done from memory, an informal approval. Each added item says who added it.
+2. **The person leaving checks it.** On "What they own" they remove anything that isn't theirs (**Not mine**) and add what tools can't see (**Add something**): a promise to a customer, a task done from memory, an informal approval. Each added item says who added it.
 3. **The manager checks it too** and names a new owner for every approval or duty that dies with the account.
 4. **Live during the interview.** Added items are scored, and risky ones join the interview queue; removed items leave it. The current question isn't disturbed.
 
@@ -53,7 +53,7 @@ Run it again after the interview; answers sharpen it.
 
 The **Onboarding kit** tab gives the person who backfills the role a 90-day plan made from the previous person's real work:
 
-- **Week 1:** read the pack, watch the recorded walkthroughs, request access to the exact systems, and meet the people the leaver named in the interview ("Arun on platform owns the Kafka cluster").
+- **Week 1:** read the pack, watch the recorded walkthroughs, request access to the exact systems, and meet the people the leaver named in the interview ("ask Grace in Order Operations before a release").
 - **Weeks 2 to 4:** shadow or run the riskiest systems and recurring duties, each with the leaver's own instructions.
 - **Days 31 to 60:** take over approvals and duties nobody else has been given, and close the must-have skill gaps from the Backfill tab.
 - **Days 61 to 90:** write the runbooks that don't exist yet.
@@ -117,7 +117,7 @@ If the model call fails mid-demo, the agent falls back to the mock for that step
 
 ## Connectors (optional)
 
-Set these on the backend. Without them, the demo people use seeded data from `backend/src/main/resources/demo/`: Priya (engineer), Meera (engineering manager with approvals) and Karthik (customer success).
+Set these on the backend. Without them, the demo people use seeded data from `backend/src/main/resources/demo/`: Elena Marsh (engineer on the OMS UI), Sofia Brandt (engineering manager with Workday approvals) and Tomas Varga (Workday payroll analyst).
 
 | Connector | Variables | What it finds |
 | --- | --- | --- |
@@ -160,32 +160,32 @@ Example event, as an HRIS would send it:
 ```bash
 curl -X POST localhost:8080/v1/events -H 'Content-Type: application/json' -d '{
   "specversion":"1.0","type":"person.departed","source":"workday","id":"evt-001",
-  "data":{"personId":"priya","name":"Priya Raman","email":"priya.raman@acme.example",
-          "role":"Senior Software Engineer","managerName":"Suresh Iyer","lastDay":"2026-12-09"}}'
+  "data":{"personId":"elena","name":"Elena Marsh","email":"elena.marsh@example.com",
+          "role":"Senior Software Engineer, OMS UI","managerName":"Marcus Whitfield","lastDay":"2026-12-09"}}'
 ```
 
 ## 4-minute demo script: three points of view
 
 Every case has a **See it as** switch at the top: the person leaving, their manager, and the new hire. Same case and data, a different job for each. The view is in the URL (`?as=leaver`, `?as=manager`, `?as=newhire`), so you can open three tabs side by side.
 
-**1. Priya, who is leaving (about 90 seconds)**
-1. Home, then **Priya resigns**. You land in Priya's view: "Hi Priya", her notice period, and the interview.
-2. Answer one question in a few words to show the follow-up, then answer properly. Press **Speak** to dictate one answer.
-3. On the quarter-end reconciliation question, **Add a recording or a Drive link** and record the screen.
-4. Open **What you own**: she can remove "Not mine" and add something the tools can't see. New owners are read-only for her; the manager decides those.
-5. Finish. **Your handover pack** asks her to check it for anything wrong or private.
+**1. Elena, who is leaving (about 90 seconds)**
+1. Home, then **Try it: Elena resigns**. You land in Elena's view with her notice period and three steps.
+2. **What you own**: the OMS UI (she wrote 64% of it), the weekly release, checkout code reviews, on-call and her open tickets. She removes one item with **Not mine** and adds one with **Add something**.
+3. **Interview**: give a short answer to see the follow-up question, then answer properly. Press **Speak** to dictate one answer.
+4. On the weekly release question, **Add a video or link** and record your screen.
+5. **Finish and write the notes**. **Check your handover** asks her to look for anything wrong or private.
 
-**2. Suresh, her manager (about 90 seconds)**
-1. Switch to **Suresh Iyer**. The headline counts what's at risk and what still needs a new owner.
-2. **What they own**: ranked by ownership share (billing-sync: 61% of changes), a CODEOWNERS approval and an on-call slot. Type new owners.
-3. Mid-interview, **Interview** is read-only for him: "Priya answers from her own view".
-4. **Handover pack**, then **Publish**. **Backfill** gives the skills for the job description, and **Onboarding kit** gives the kit he can rebuild.
-5. Optional: Home, then **Meera resigns** to show a manager leaving. Her map is mostly approvals and the agent asks how she decides on each.
+**2. Marcus, her manager (about 90 seconds)**
+1. Switch to **Marcus**. The page shows what still needs a new owner and what isn't written down.
+2. **What they own**: type a new owner for checkout reviews and on-call.
+3. During the interview, **Interview** is read-only for him. Only Elena answers.
+4. **Handover notes**, then **Publish**. **Hire a replacement** lists the skills for the job description, and **90-day plan** gives the new hire's plan.
+5. Optional: Home, then **Sofia, a manager, resigns**. Her list is mostly Workday approvals, and the interview asks how she decides on each.
 
 **3. The new hire (about 60 seconds)**
-1. Switch to **New hire**. Before publish they see "Priya's handover is still being prepared"; after publish they get **Your first 90 days**.
-2. Tick off week 1 tasks; people to meet come from Priya's answers.
-3. **Ask Priya's handover**: "How do I replay a failed billing-sync batch?" gets an answer with a source. "What is the office wifi password?" gets "not covered".
+1. Switch to **New hire**. Before publishing they see "Elena's handover isn't ready yet". After publishing they get **Your first 90 days**.
+2. Tick off week 1 tasks. The people to meet come from Elena's answers.
+3. **Ask a question**: "How do I run the weekly OMS UI release?" gets an answer with its source. "What is the office wifi password?" gets "Not covered".
 
 ## Tests
 
