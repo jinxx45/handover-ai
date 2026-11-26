@@ -120,7 +120,9 @@ public class CaseService {
         c.setManagerName(d.managerName());
         c.setLastDay(d.lastDay());
         c.setExitType(d.exitType() == null ? "voluntary" : d.exitType());
-        cases.save(c);
+        // The id is set by us, so save() merges and returns the managed copy; keep using that one,
+        // or the status and agent run id set below are never written.
+        c = cases.save(c);
 
         mapOwnership(c, new PersonRef(d.personId(), d.name(), d.email(), d.githubLogin()));
         startAgentRun(c);
@@ -144,11 +146,13 @@ public class CaseService {
         return detail(c);
     }
 
-    /** Re-run the agent for a case that failed (e.g. the agent was down when the event arrived). */
+    /** Start (or restart) the interview for a case that failed or never got past mapping. */
     @Transactional
     public CaseViews.CaseDetail retry(String caseId) {
         HandoverCase c = find(caseId);
-        requireStatus(c, CaseStatus.FAILED);
+        if (c.getStatus() != CaseStatus.FAILED && c.getStatus() != CaseStatus.MAPPING) {
+            throw new ConflictException("Case is " + c.getStatus() + ", expected FAILED or MAPPING");
+        }
         startAgentRun(c);
         return detail(c);
     }

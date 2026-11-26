@@ -3,7 +3,7 @@ import { api } from '../api';
 import type { CaseDetail, Item } from '../types';
 import type { Pov } from '../pov';
 import type { Tab } from '../pages/CasePage';
-import { State, Strip, firstName, formatDate, itemState, type ItemState } from './ui';
+import { Spinner, State, Strip, firstName, formatDate, itemState, type ItemState } from './ui';
 
 const KIND: Record<string, string> = {
   recurring_task: 'Regular task',
@@ -198,7 +198,7 @@ function NextCard({ c, pov, onTab }: { c: CaseDetail; pov: Pov; onTab: (t: Tab) 
     </div>
   );
   if (pov === 'leaver') {
-    if (c.status === 'MAPPING') return card('Next: the interview', 'Check this list first. The interview starts once the list is ready.');
+    if (c.status === 'MAPPING') return card('Next: the interview', 'Check this list, then press \u201cLooks right. Start the interview\u201d.');
     if (c.status === 'INTERVIEWING') {
       const left = (c.currentQuestion?.remaining ?? 0) + 1;
       return card(
@@ -267,7 +267,22 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
   const groups = [...byKey.values()]
     .sort((a, b) => CATEGORY_ORDER.indexOf(a.key) - CATEGORY_ORDER.indexOf(b.key))
     .map((g) => ({ ...g, items: g.items.sort((a, b) => (b.riskScore ?? 0) - (a.riskScore ?? 0)) }));
-  const leaverCanStart = self && c.status === 'INTERVIEWING';
+  const leaverCanStart = self && (c.status === 'MAPPING' || c.status === 'INTERVIEWING');
+  const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
+  async function startInterview() {
+    if (c.status === 'INTERVIEWING') return onTab('interview');
+    setStarting(true);
+    setStartError(null);
+    try {
+      onChange(await api.retry(c.id));
+      onTab('interview');
+    } catch (e) {
+      setStartError(`The interview couldn\u2019t start: ${(e as Error).message}. Try again in a minute.`);
+    } finally {
+      setStarting(false);
+    }
+  }
 
   const row = (item: Item, state: ItemState = itemState(item)) => (
     <li className="oi" key={item.id}>
@@ -322,11 +337,12 @@ export default function CoverageTab({ c, onChange, pov, onTab }: { c: CaseDetail
               <b>Is everything correct?</b>
               <span>Remove what isn&rsquo;t yours with &ldquo;Not mine&rdquo;, add anything missing below, then start the interview.</span>
             </div>
-            <button className="btn" onClick={() => onTab('interview')}>
-              {c.turns.length ? 'Continue the interview' : 'Looks right. Start the interview'}
+            <button className="btn" onClick={startInterview} disabled={starting}>
+              {starting && <Spinner />} {c.turns.length ? 'Continue the interview' : 'Looks right. Start the interview'}
             </button>
           </div>
         )}
+        {startError && <p className="note error" style={{ marginTop: 12 }}>{startError}</p>}
 
         {groups.map((g) => (
           <section className="og" key={g.key}>
